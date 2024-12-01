@@ -1,6 +1,6 @@
 ﻿using static System.Single;
 
-namespace CGA_2.Components.Lights
+namespace CGA2.Components.Lights
 {
     public class SpotLight : SphericalLight
     {

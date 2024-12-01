@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media.Media3D;
 
-namespace CGA_2.Components
+namespace CGA2.Components
 {
     public class Scene
     {

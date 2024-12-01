@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using static System.Numerics.Vector3;
 
-namespace CGA_2.Components
+namespace CGA2.Components
 {
     public class Transform()
     {

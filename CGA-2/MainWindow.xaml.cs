@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CGA_2
+namespace CGA2
 {
     using DPIScale = (double X, double Y);
 

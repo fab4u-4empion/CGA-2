@@ -1,4 +1,4 @@
-﻿namespace CGA_2.Components
+﻿namespace CGA2.Components
 {
     public class SceneObject
     {
