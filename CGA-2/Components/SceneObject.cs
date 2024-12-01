@@ -2,6 +2,6 @@
 {
     public class SceneObject
     {
-        Transform Transform { get; set; } = new();
+        public Transform Transform { get; set; } = new();
     }
 }
