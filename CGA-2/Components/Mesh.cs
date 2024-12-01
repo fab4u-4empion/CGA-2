@@ -1,6 +1,6 @@
 ﻿namespace CGA2.Components
 {
-    public class Model : SceneObject
+    public class Mesh : SceneObject
     {
     }
 }

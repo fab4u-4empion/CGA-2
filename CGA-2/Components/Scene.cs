@@ -1,11 +1,11 @@
-﻿using System.Windows.Media.Media3D;
+﻿using CGA2.Components.Lights;
 
 namespace CGA2.Components
 {
     public class Scene
     {
-        public Camera Camera { get; set; } = new();
+        public List<Camera> Cameras { get; set; } = [];
         public List<Light> Lights { get; set; } = [];
-        public List<Model> Models { get; set; } = [];
+        public List<Mesh> Meshes { get; set; } = [];
     }
 }
