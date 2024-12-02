@@ -2,7 +2,7 @@
 
 namespace CGA2.Components
 {
-    public class Camera : SceneObject
+    public class Camera
     {
         public float FieldOfView { get; set; } = Pi / 4f;
         public float NearPlane { get; set; } = 0.1f;
