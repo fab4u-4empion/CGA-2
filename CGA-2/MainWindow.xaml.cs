@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using CGA2.Components;
+using CGA2.Utils;
+using Microsoft.Win32;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -15,6 +18,8 @@ namespace CGA2
         private DPIScale Scale = (1, 1);
 
         private WindowState LastState;
+
+        private Scene Scene = new();
 
         public MainWindow()
         {
@@ -49,6 +54,21 @@ namespace CGA2
                             WindowStyle = WindowStyle.SingleBorderWindow;
                             ResizeMode = ResizeMode.CanResize;
                             WindowState = LastState;
+                        }
+                    }
+                    break;
+
+                case Key.O:
+                    if (!e.IsRepeat)
+                    {
+                        OpenFileDialog dlg = new()
+                        {
+                            Filter = "glTF (*.gltf)|*.gltf"
+                        };
+
+                        if (dlg.ShowDialog() == true)
+                        {
+                            GLTFReader.OpenFile(dlg.FileName, Scene);
                         }
                     }
                     break;

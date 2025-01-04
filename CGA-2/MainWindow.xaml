@@ -10,6 +10,7 @@
         Title="Renderer 2.0" 
         Height="600" 
         Width="600"
+        WindowStartupLocation="CenterScreen"
         SizeChanged="Window_SizeChanged"
         KeyDown="Window_KeyDown">
     <Grid x:Name="Grid">
