@@ -1,6 +1,10 @@
 ﻿using CGA2.Components;
+using CGA2.Components.Cameras;
+using CGA2.Components.Objects;
+using CGA2.Renderers;
 using CGA2.Utils;
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,7 +23,10 @@ namespace CGA2
 
         private WindowState LastState;
 
+        private Stopwatch Timer = new();
+
         private Scene Scene = new();
+        private Renderer Renderer = new Rasterizer();
 
         public MainWindow()
         {
@@ -31,7 +38,31 @@ namespace CGA2
             DpiScale dpi = VisualTreeHelper.GetDpi(this);
             Scale = (dpi.DpiScaleX, dpi.DpiScaleY);
 
-            ResolutionTextBlock.Text = $"{(int)(Grid.ActualWidth * Scale.X)} × {(int)(Grid.ActualHeight * Scale.Y)}";
+            Renderer.ResizeBuffers(Grid.ActualWidth * Scale.X, Grid.ActualHeight * Scale.Y);
+            Canvas.Source = Renderer.Result.Source;
+
+            Timer.Restart();
+            Renderer.Render(Scene);
+            Timer.Stop();
+
+            ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
+            RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Canvas.Source = Renderer.Result.Source;
+
+            OrthographicCamera camera = new();
+
+            CameraObject cameraObject = new() 
+            { 
+                Camera = camera,
+                Location = new(0, 0, 5f),
+            };
+
+            Scene.CameraObjects.Add(cameraObject);
+            Scene.Cameras.Add(camera);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
