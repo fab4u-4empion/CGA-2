@@ -5,11 +5,11 @@ using static System.Numerics.Vector3;
 
 namespace CGA2.Components.Objects
 {
-    public class CameraObject : Object
+    public class CameraObject : SceneObject
     {
         public override string Name { get; set; } = "Camera";
         public Camera Camera { get; set; } = new PerspectiveCamera();
 
-        public Matrix4x4 ViewMatrix => CreateLookAt(Location, Zero, UnitY);
+        public Matrix4x4 ViewMatrix => CreateLookTo(Location, -UnitZ, UnitY);
     }
 }

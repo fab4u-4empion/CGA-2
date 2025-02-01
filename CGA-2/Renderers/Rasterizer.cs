@@ -117,7 +117,7 @@ namespace CGA2.Renderers
                                 for (int y = top; y < bottom; y++)
                                 {
                                     Vector4 p = p1 + (y - p1.Y) * k;
-                                    Result.SetPixel(x, y, Vector3.UnitZ);
+                                    Result.SetPixel(x, y, Vector3.Zero);
                                 }
                             }
                         }

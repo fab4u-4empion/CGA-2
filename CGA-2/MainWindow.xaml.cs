@@ -53,12 +53,12 @@ namespace CGA2
         {
             Canvas.Source = Renderer.Result.Source;
 
-            OrthographicCamera camera = new();
+            PerspectiveCamera camera = new();
 
             CameraObject cameraObject = new() 
             { 
                 Camera = camera,
-                Location = new(0, 0, 5f),
+                Location = new(0, 5f, 30f),
             };
 
             Scene.CameraObjects.Add(cameraObject);
