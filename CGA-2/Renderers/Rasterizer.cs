@@ -5,8 +5,6 @@ using Utils;
 using static System.Int32;
 using static System.Single;
 using static CGA2.Settings;
-using static System.Numerics.Matrix4x4;
-using static System.Numerics.Vector4;
 using System.Buffers;
 using System.Collections.Concurrent;
 
@@ -16,7 +14,7 @@ namespace CGA2.Renderers
     {
         public override Pbgra32Bitmap Result { get; set; } = new(1, 1);
 
-        private Matrix4x4 ViewportMatrix { get; set; } = CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
+        private Matrix4x4 ViewportMatrix { get; set; } = Matrix4x4.CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
 
         public static float PerpDotProduct(Vector2 a, Vector2 b)
         {
@@ -34,7 +32,23 @@ namespace CGA2.Renderers
                 Matrix4x4 projectionMatrix = scene.CameraObjects[SelectedCamera].Camera.ProjectionMatrix;
 
                 Matrix4x4 matrix =  worldMatrix * viewMatrix * projectionMatrix;
-                
+
+                meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
+                meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
+                meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
+
+                Parallel.For(0, meshObject.Mesh.Positions.Count, (index) =>
+                {
+                    Vector3 p = Vector3.Transform(meshObject.Mesh.Positions[index], worldMatrix);
+                    meshObject.WorldPositions[index] = p;
+                    meshObject.ClipPositions[index] = Vector4.Transform(p, matrix);
+                });
+
+                Parallel.For(0, meshObject.Mesh.Normals.Count, (index) =>
+                {
+                    meshObject.WorldPositions[index] = Vector3.Normalize(Vector3.Transform(meshObject.Mesh.Normals[index], worldMatrix));
+                });
+
                 Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Triangles.Count, 3), (range) =>
                 {
                     Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
@@ -45,9 +59,9 @@ namespace CGA2.Renderers
 
                     byte count = 0;
 
-                    Vector4 v1 = Transform(meshObject.Mesh.Positions[index1], matrix);
-                    Vector4 v2 = Transform(meshObject.Mesh.Positions[index2], matrix);
-                    Vector4 v3 = Transform(meshObject.Mesh.Positions[index3], matrix);
+                    Vector4 v1 = meshObject.ClipPositions[index1];
+                    Vector4 v2 = meshObject.ClipPositions[index2];
+                    Vector4 v3 = meshObject.ClipPositions[index3];
 
                     if (v1.Z >= 0)
                         result[count++] = v1;
@@ -55,7 +69,7 @@ namespace CGA2.Renderers
                     if (v1.Z < 0 != v2.Z < 0)
                     {
                         float t = -v1.Z / (v2.Z - v1.Z);
-                        result[count++] = Lerp(v1, v2, t);
+                        result[count++] = Vector4.Lerp(v1, v2, t);
                     }
 
                     if (v2.Z >= 0)
@@ -64,7 +78,7 @@ namespace CGA2.Renderers
                     if (v2.Z < 0 != v3.Z < 0)
                     {
                         float t = -v2.Z / (v3.Z - v2.Z);
-                        result[count++] = Lerp(v2, v3, t);
+                        result[count++] = Vector4.Lerp(v2, v3, t);
                     }
 
                     if (v3.Z >= 0)
@@ -73,11 +87,11 @@ namespace CGA2.Renderers
                     if (v1.Z < 0 != v3.Z < 0)
                     {
                         float t = -v1.Z / (v3.Z - v1.Z);
-                        result[count++] = Lerp(v1, v3, t);
+                        result[count++] = Vector4.Lerp(v1, v3, t);
                     }
 
                     for (int j = 0; j < count; j++)
-                        result[j] = Transform(result[j] / result[j].W, ViewportMatrix);
+                        result[j] = Vector4.Transform(result[j] / result[j].W, ViewportMatrix);
 
                     for (int j = 1; j < count - 1; j++)
                     {
@@ -135,7 +149,7 @@ namespace CGA2.Renderers
         {
             Result = new(Max(1, (int)(width * Scaling)), Max(1, (int)(height * Scaling)));
 
-            ViewportMatrix = CreateViewportLeftHanded(-0.5f, -0.5f, Result.PixelWidth, Result.PixelHeight, 0, 1);
+            ViewportMatrix = Matrix4x4.CreateViewportLeftHanded(-0.5f, -0.5f, Result.PixelWidth, Result.PixelHeight, 0, 1);
         }
     }
 }
