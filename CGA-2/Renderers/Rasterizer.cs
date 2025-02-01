@@ -7,6 +7,7 @@ using static System.Single;
 using static CGA2.Settings;
 using System.Buffers;
 using System.Collections.Concurrent;
+using System;
 
 namespace CGA2.Renderers
 {
@@ -23,45 +24,54 @@ namespace CGA2.Renderers
 
         public override void Render(Scene scene)
         {
+            if (scene.CameraObjects.Count == 0) return;
+
+            scene.CameraObjects[SelectedCamera].Camera.AspectRatio = (float)Result.PixelWidth / Result.PixelHeight;
+
             Result.Source.Lock();
 
-            foreach(MeshObject meshObject in scene.MeshObjects)
+            Parallel.For(0, scene.MeshObjects.Count, (index) =>
             {
+                MeshObject meshObject = scene.MeshObjects[index];
+
                 Matrix4x4 worldMatrix = meshObject.WorldMatrix;
                 Matrix4x4 viewMatrix = scene.CameraObjects[SelectedCamera].ViewMatrix;
                 Matrix4x4 projectionMatrix = scene.CameraObjects[SelectedCamera].Camera.ProjectionMatrix;
 
-                Matrix4x4 matrix =  worldMatrix * viewMatrix * projectionMatrix;
+                Matrix4x4 matrix = worldMatrix * viewMatrix * projectionMatrix;
 
                 meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
                 meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
                 meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
 
-                Parallel.For(0, meshObject.Mesh.Positions.Count, (index) =>
+                for (int i = 0; i < meshObject.Mesh.Positions.Count; i++)
                 {
-                    Vector3 p = Vector3.Transform(meshObject.Mesh.Positions[index], worldMatrix);
-                    meshObject.WorldPositions[index] = p;
-                    meshObject.ClipPositions[index] = Vector4.Transform(p, matrix);
-                });
+                    meshObject.WorldPositions[i] = Vector3.Transform(meshObject.Mesh.Positions[i], worldMatrix);
+                    meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], matrix);
+                }
 
-                Parallel.For(0, meshObject.Mesh.Normals.Count, (index) =>
+                for (int i = 0; i < meshObject.Mesh.Normals.Count; i++)
                 {
-                    meshObject.WorldPositions[index] = Vector3.Normalize(Vector3.Transform(meshObject.Mesh.Normals[index], worldMatrix));
-                });
+                    meshObject.WorldNormals[i] = Vector3.Normalize(Vector3.Transform(meshObject.Mesh.Normals[i], worldMatrix));
+                }
+            });
 
-                Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Triangles.Count, 3), (range) =>
+            Parallel.For(0, scene.MeshObjects.Count, (index) =>
+            {
+                MeshObject meshObject = scene.MeshObjects[index];
+
+                for (int i = 0; i < meshObject.Mesh.Triangles.Count; i += 3)
                 {
-                    Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
-
-                    int index1 = meshObject.Mesh.Triangles[range.Item1];
-                    int index2 = meshObject.Mesh.Triangles[range.Item1 + 1];
-                    int index3 = meshObject.Mesh.Triangles[range.Item1 + 2];
-
-                    byte count = 0;
+                    int index1 = meshObject.Mesh.Triangles[i];
+                    int index2 = meshObject.Mesh.Triangles[i + 1];
+                    int index3 = meshObject.Mesh.Triangles[i + 2];
 
                     Vector4 v1 = meshObject.ClipPositions[index1];
                     Vector4 v2 = meshObject.ClipPositions[index2];
                     Vector4 v3 = meshObject.ClipPositions[index3];
+
+                    Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
+                    byte count = 0;
 
                     if (v1.Z >= 0)
                         result[count++] = v1;
@@ -138,8 +148,8 @@ namespace CGA2.Renderers
                     }
 
                     ArrayPool<Vector4>.Shared.Return(result);
-                });
-            }
+                }
+            });
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));
             Result.Source.Unlock();

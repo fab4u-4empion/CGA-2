@@ -33,6 +33,16 @@ namespace CGA2
             InitializeComponent();
         }
 
+        private void Draw()
+        {
+            Timer.Restart();
+            Renderer.Render(Scene);
+            Timer.Stop();
+
+            ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
+            RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
+        }
+
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             DpiScale dpi = VisualTreeHelper.GetDpi(this);
@@ -41,12 +51,7 @@ namespace CGA2
             Renderer.ResizeBuffers(Grid.ActualWidth * Scale.X, Grid.ActualHeight * Scale.Y);
             Canvas.Source = Renderer.Result.Source;
 
-            Timer.Restart();
-            Renderer.Render(Scene);
-            Timer.Stop();
-
-            ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
-            RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
+            Draw();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -58,7 +63,7 @@ namespace CGA2
             CameraObject cameraObject = new() 
             { 
                 Camera = camera,
-                Location = new(0, 5f, 30f),
+                Location = new(0, 5f, 20f),
             };
 
             Scene.CameraObjects.Add(cameraObject);
@@ -100,6 +105,7 @@ namespace CGA2
                         if (dlg.ShowDialog() == true)
                         {
                             GLTFReader.OpenFile(dlg.FileName, Scene);
+                            Draw();
                         }
                     }
                     break;
