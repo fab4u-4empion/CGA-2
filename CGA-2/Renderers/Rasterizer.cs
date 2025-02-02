@@ -8,6 +8,7 @@ using static CGA2.Settings;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System;
+using System.Reflection;
 
 namespace CGA2.Renderers
 {
@@ -30,10 +31,8 @@ namespace CGA2.Renderers
 
             Result.Source.Lock();
 
-            Parallel.For(0, scene.MeshObjects.Count, (index) =>
+            foreach (MeshObject meshObject in scene.MeshObjects)
             {
-                MeshObject meshObject = scene.MeshObjects[index];
-
                 Matrix4x4 worldMatrix = meshObject.WorldMatrix;
                 Matrix4x4 viewMatrix = scene.CameraObjects[SelectedCamera].ViewMatrix;
                 Matrix4x4 projectionMatrix = scene.CameraObjects[SelectedCamera].Camera.ProjectionMatrix;
@@ -44,112 +43,121 @@ namespace CGA2.Renderers
                 meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
                 meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
 
-                for (int i = 0; i < meshObject.Mesh.Positions.Count; i++)
+                Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Positions.Count), (range) =>
                 {
-                    meshObject.WorldPositions[i] = Vector3.Transform(meshObject.Mesh.Positions[i], worldMatrix);
-                    meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], matrix);
-                }
+                    for (int i = range.Item1; i < range.Item2; i++)
+                    {
+                        meshObject.WorldPositions[i] = Vector3.Transform(meshObject.Mesh.Positions[i], worldMatrix);
+                        meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], matrix);
+                    }
+                });
 
-                for (int i = 0; i < meshObject.Mesh.Normals.Count; i++)
+                Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Normals.Count), (range) =>
                 {
-                    meshObject.WorldNormals[i] = Vector3.Normalize(Vector3.Transform(meshObject.Mesh.Normals[i], worldMatrix));
-                }
-            });
+                    for (int i = range.Item1; i < range.Item2; i++)
+                    {
+                        meshObject.WorldNormals[i] = Vector3.Normalize(Vector3.Transform(meshObject.Mesh.Normals[i], worldMatrix));
+                    }
+                });
+            }
 
-            Parallel.For(0, scene.MeshObjects.Count, (index) =>
+            foreach (MeshObject meshObject in scene.MeshObjects)
             {
-                MeshObject meshObject = scene.MeshObjects[index];
-
-                for (int i = 0; i < meshObject.Mesh.Triangles.Count; i += 3)
+                Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Triangles.Count / 3), (range) =>
                 {
-                    int index1 = meshObject.Mesh.Triangles[i];
-                    int index2 = meshObject.Mesh.Triangles[i + 1];
-                    int index3 = meshObject.Mesh.Triangles[i + 2];
-
-                    Vector4 v1 = meshObject.ClipPositions[index1];
-                    Vector4 v2 = meshObject.ClipPositions[index2];
-                    Vector4 v3 = meshObject.ClipPositions[index3];
-
-                    Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
-                    byte count = 0;
-
-                    if (v1.Z >= 0)
-                        result[count++] = v1;
-
-                    if (v1.Z < 0 != v2.Z < 0)
+                    for (int i = range.Item1; i < range.Item2; i++)
                     {
-                        float t = -v1.Z / (v2.Z - v1.Z);
-                        result[count++] = Vector4.Lerp(v1, v2, t);
-                    }
+                        int index = i * 3;
 
-                    if (v2.Z >= 0)
-                        result[count++] = v2;
+                        int index1 = meshObject.Mesh.Triangles[index];
+                        int index2 = meshObject.Mesh.Triangles[index + 1];
+                        int index3 = meshObject.Mesh.Triangles[index + 2];
 
-                    if (v2.Z < 0 != v3.Z < 0)
-                    {
-                        float t = -v2.Z / (v3.Z - v2.Z);
-                        result[count++] = Vector4.Lerp(v2, v3, t);
-                    }
+                        Vector4 v1 = meshObject.ClipPositions[index1];
+                        Vector4 v2 = meshObject.ClipPositions[index2];
+                        Vector4 v3 = meshObject.ClipPositions[index3];
 
-                    if (v3.Z >= 0)
-                        result[count++] = v3;
+                        Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
+                        byte count = 0;
 
-                    if (v1.Z < 0 != v3.Z < 0)
-                    {
-                        float t = -v1.Z / (v3.Z - v1.Z);
-                        result[count++] = Vector4.Lerp(v1, v3, t);
-                    }
+                        if (v1.Z >= 0)
+                            result[count++] = v1;
 
-                    for (int j = 0; j < count; j++)
-                        result[j] = Vector4.Transform(result[j] / result[j].W, ViewportMatrix);
-
-                    for (int j = 1; j < count - 1; j++)
-                    {
-                        Vector4 a = result[0];
-                        Vector4 b = result[j];
-                        Vector4 c = result[j + 1];
-
-                        if (PerpDotProduct(new(c.X - a.X, c.Y - a.Y), new(b.X - a.X, b.Y - a.Y)) > 0)
+                        if (v1.Z < 0 != v2.Z < 0)
                         {
+                            float t = -v1.Z / (v2.Z - v1.Z);
+                            result[count++] = Vector4.Lerp(v1, v2, t);
+                        }
 
-                            if (b.X < a.X)
-                                (a, b) = (b, a);
+                        if (v2.Z >= 0)
+                            result[count++] = v2;
 
-                            if (c.X < a.X)
-                                (a, c) = (c, a);
+                        if (v2.Z < 0 != v3.Z < 0)
+                        {
+                            float t = -v2.Z / (v3.Z - v2.Z);
+                            result[count++] = Vector4.Lerp(v2, v3, t);
+                        }
 
-                            if (c.X < b.X)
-                                (b, c) = (c, b);
+                        if (v3.Z >= 0)
+                            result[count++] = v3;
 
-                            Vector4 k1 = (c - a) / (c.X - a.X);
-                            Vector4 k2 = (b - a) / (b.X - a.X);
-                            Vector4 k3 = (c - b) / (c.X - b.X);
+                        if (v1.Z < 0 != v3.Z < 0)
+                        {
+                            float t = -v1.Z / (v3.Z - v1.Z);
+                            result[count++] = Vector4.Lerp(v1, v3, t);
+                        }
 
-                            int left = Max((int)Ceiling(a.X), 0);
-                            int right = Min((int)Ceiling(c.X), Result.PixelWidth);
+                        for (int j = 0; j < count; j++)
+                            result[j] = Vector4.Transform(result[j] / result[j].W, ViewportMatrix);
 
-                            for (int x = left; x < right; x++)
+                        for (int j = 1; j < count - 1; j++)
+                        {
+                            Vector4 a = result[0];
+                            Vector4 b = result[j];
+                            Vector4 c = result[j + 1];
+
+                            if (PerpDotProduct(new(c.X - a.X, c.Y - a.Y), new(b.X - a.X, b.Y - a.Y)) > 0)
                             {
-                                Vector4 p1 = a + (x - a.X) * k1;
-                                Vector4 p2 = x < b.X ? a + (x - a.X) * k2 : b + (x - b.X) * k3;
 
-                                Vector4 k = (p2 - p1) / (p2.Y - p1.Y);
+                                if (b.X < a.X)
+                                    (a, b) = (b, a);
 
-                                int top = Max((int)Ceiling(Min(p1.Y, p2.Y)), 0);
-                                int bottom = Min((int)Ceiling(Max(p1.Y, p2.Y)), Result.PixelHeight);
+                                if (c.X < a.X)
+                                    (a, c) = (c, a);
 
-                                for (int y = top; y < bottom; y++)
+                                if (c.X < b.X)
+                                    (b, c) = (c, b);
+
+                                Vector4 k1 = (c - a) / (c.X - a.X);
+                                Vector4 k2 = (b - a) / (b.X - a.X);
+                                Vector4 k3 = (c - b) / (c.X - b.X);
+
+                                int left = Max((int)Ceiling(a.X), 0);
+                                int right = Min((int)Ceiling(c.X), Result.PixelWidth);
+
+                                for (int x = left; x < right; x++)
                                 {
-                                    Vector4 p = p1 + (y - p1.Y) * k;
-                                    Result.SetPixel(x, y, Vector3.Zero);
+                                    Vector4 p1 = a + (x - a.X) * k1;
+                                    Vector4 p2 = x < b.X ? a + (x - a.X) * k2 : b + (x - b.X) * k3;
+
+                                    Vector4 k = (p2 - p1) / (p2.Y - p1.Y);
+
+                                    int top = Max((int)Ceiling(Min(p1.Y, p2.Y)), 0);
+                                    int bottom = Min((int)Ceiling(Max(p1.Y, p2.Y)), Result.PixelHeight);
+
+                                    for (int y = top; y < bottom; y++)
+                                    {
+                                        Vector4 p = p1 + (y - p1.Y) * k;
+                                        Result.SetPixel(x, y, Vector3.Zero);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    ArrayPool<Vector4>.Shared.Return(result);
-                }
-            });
+                        ArrayPool<Vector4>.Shared.Return(result);
+                    }
+                });
+            }
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));
             Result.Source.Unlock();
