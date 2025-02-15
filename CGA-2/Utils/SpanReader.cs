@@ -26,9 +26,9 @@ namespace CGA2.Utils
             return BitConverter.ToSingle(buffer.Slice(offset, 4));
         }
 
-        public static short ReadShort(Span<byte> buffer, int offset)
+        public static ushort ReadUShort(Span<byte> buffer, int offset)
         {
-            return BitConverter.ToInt16(buffer.Slice(offset, 2));
+            return BitConverter.ToUInt16(buffer.Slice(offset, 2));
         }
     }
 }

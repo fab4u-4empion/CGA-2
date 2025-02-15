@@ -9,6 +9,6 @@ namespace CGA2.Components
         public List<Vector3> Positions = [];
         public List<Vector3> Normals = [];
         public List<Vector2> UVs = [];
-        public List<short> Triangles = [];
+        public List<ushort> Triangles = [];
     }
 }

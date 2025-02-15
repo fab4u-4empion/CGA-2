@@ -43,7 +43,7 @@ namespace CGA2.Renderers
             Spins[x, y].Exit(false);
         }
 
-        private static void TransformAttributes(Scene scene, CameraObject cameraObject, MeshObject meshObject)
+        private static void TransformAttributes(CameraObject cameraObject, MeshObject meshObject)
         {
             Matrix4x4 worldMatrix = meshObject.WorldMatrix;
             Matrix4x4 viewMatrix = cameraObject.ViewMatrix;
@@ -273,7 +273,7 @@ namespace CGA2.Renderers
 
             foreach (MeshObject meshObject in scene.MeshObjects)
             {
-                TransformAttributes(scene, cameraObject, meshObject);
+                TransformAttributes(cameraObject, meshObject);
                 Rasterize(meshObject, DrawIntoViewBuffer);
             }
 
