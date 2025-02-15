@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿
+using System.Numerics;
 using static System.Numerics.Matrix4x4;
 
 namespace CGA2.Components.Objects
@@ -16,8 +17,8 @@ namespace CGA2.Components.Objects
 
         public Matrix4x4 WorldMatrix => CreateScale(Scale) * CreateFromQuaternion(Rotation) * CreateTranslation(Location) * (Parent?.WorldMatrix ?? Identity);
 
-        public Quaternion WorldRotation => Rotation * (Parent?.Rotation ?? Quaternion.Identity);
+        public Quaternion WorldRotation => Quaternion.Normalize(Rotation * (Parent?.WorldRotation ?? Quaternion.Identity));
 
-        public Vector3 WorldLocation => Location + (Parent?.Location ?? Vector3.Zero);
+        public Vector3 WorldLocation => Location + (Parent?.WorldLocation ?? Vector3.Zero);
     }
 }
