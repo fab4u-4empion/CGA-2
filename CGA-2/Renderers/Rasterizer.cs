@@ -13,6 +13,7 @@ using CGA2.Utils;
 namespace CGA2.Renderers
 {
     using ViewBufferData = (MeshObject? MeshObject, int Index);
+    using ScreenToWorldParams = (Vector3 Dir0, Vector3 DdDx, Vector3 DdDy);
 
     public class Rasterizer : Renderer
     {
@@ -24,8 +25,6 @@ namespace CGA2.Renderers
         private Buffer<float> ZBuffer = new(0, 0);
         private Buffer<ViewBufferData> ViewBuffer = new(0, 0);
         private Buffer<Vector3> HDRBuffer = new(0, 0);
-
-        private Vector3 p0, dpdx, dpdy;
 
         private static float PerpDotProduct(Vector2 a, Vector2 b) => a.X * b.Y - a.Y * b.X;
 
@@ -44,11 +43,11 @@ namespace CGA2.Renderers
             Spins[x, y].Exit(false);
         }
 
-        private static void TransformAttributes(Scene scene, MeshObject meshObject)
+        private static void TransformAttributes(Scene scene, CameraObject cameraObject, MeshObject meshObject)
         {
             Matrix4x4 worldMatrix = meshObject.WorldMatrix;
-            Matrix4x4 viewMatrix = scene.CameraObjects[SelectedCamera].ViewMatrix;
-            Matrix4x4 projectionMatrix = scene.CameraObjects[SelectedCamera].Camera.ProjectionMatrix;
+            Matrix4x4 viewMatrix = cameraObject.ViewMatrix;
+            Matrix4x4 projectionMatrix = cameraObject.Camera.ProjectionMatrix;
 
             Matrix4x4 matrix = worldMatrix * viewMatrix * projectionMatrix;
 
@@ -69,7 +68,7 @@ namespace CGA2.Renderers
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], worldMatrix));
+                    meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], meshObject.WorldRotation));
                 }
             });
         }
@@ -172,7 +171,7 @@ namespace CGA2.Renderers
             });
         }
 
-        private Vector3 GetPixelColor(Scene scene, ViewBufferData objectInfo, int x, int y)
+        private static Vector3 GetPixelColor(CameraObject cameraObject, ScreenToWorldParams screenToWorld, ViewBufferData objectInfo, int x, int y)
         {
             int index = objectInfo.Index * 3;
 
@@ -184,11 +183,11 @@ namespace CGA2.Renderers
             Vector3 bw = objectInfo.MeshObject!.WorldPositions[index2];
             Vector3 cw = objectInfo.MeshObject!.WorldPositions[index3];
 
-            Vector3 D1 = p0 + x * dpdx + y * dpdy;
-            Vector3 D2 = D1 + dpdx;
-            Vector3 D3 = D1 + dpdy;
+            Vector3 D1 = screenToWorld.Dir0 + x * screenToWorld.DdDx + y * screenToWorld.DdDy;
+            Vector3 D2 = D1 + screenToWorld.DdDx;
+            Vector3 D3 = D1 + screenToWorld.DdDy;
 
-            Vector3 tvec = scene.CameraObjects[SelectedCamera].Location;
+            Vector3 tvec = cameraObject.WorldLocation;
 
             Vector3 e1 = aw - cw;
             Vector3 e2 = bw - cw;
@@ -219,17 +218,17 @@ namespace CGA2.Renderers
 
             Vector3 n = u * n1 + v * n2 + w * n3;
 
-            return Max(Dot(n, UnitZ), 0) * One;
+            return Dot(Normalize(n), UnitZ) * One;
         }
 
-        private void DrawViewBuffer(Scene scene)
+        private void DrawViewBuffer(CameraObject cameraObject, ScreenToWorldParams screenToWorld)
         {
             Parallel.For(0, HDRBuffer.Height, (y) =>
             {
                 for (int x = 0; x < HDRBuffer.Width; x++)
                 {
                     if (ViewBuffer[x, y].MeshObject != null)
-                    HDRBuffer[x, y] = GetPixelColor(scene, ViewBuffer[x, y], x, y);
+                    HDRBuffer[x, y] = GetPixelColor(cameraObject, screenToWorld, ViewBuffer[x, y], x, y);
                 }
             });
         }
@@ -245,29 +244,26 @@ namespace CGA2.Renderers
             });
         }
 
-        private (Vector3, Vector3, Vector3) GetViewportToWorldParams(float tanParam, CameraObject cameraObject)
+        private ScreenToWorldParams GetViewportToWorldParams(CameraObject cameraObject)
         {
-            float aspect = cameraObject.Camera.AspectRatio;
-            float tan = Tan(tanParam);
-            Matrix4x4 cameraRotation = Matrix4x4.CreateFromQuaternion(cameraObject.Rotation);
+            Matrix4x4.Invert(cameraObject.ViewMatrix * cameraObject.Camera.ProjectionMatrix * ViewportMatrix, out Matrix4x4 screenToWorldMatrix);
 
-            Vector3 X = new Vector3(cameraRotation.M11, cameraRotation.M12, cameraRotation.M13) * tan * aspect;
-            Vector3 Y = new Vector3(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
-            Vector3 Z = new(cameraRotation.M31, cameraRotation.M32, cameraRotation.M33);
-            Vector3 p0 = (1f / Result.PixelWidth - 1) * X + (-1f / Result.PixelHeight + 1) * Y - Z;
-            Vector3 dpdx = X * 2 / Result.PixelWidth;
-            Vector3 dpdy = Y * -2 / Result.PixelHeight;
+            Vector3 dir0 = Vector4.Transform(Vector4.Create(0, 0, 0, 1) * cameraObject.Camera.NearPlane, screenToWorldMatrix).AsVector3();
+            Vector3 dir1 = Vector4.Transform(Vector4.Create(1, 0, 0, 1) * cameraObject.Camera.NearPlane, screenToWorldMatrix).AsVector3();
+            Vector3 dir2 = Vector4.Transform(Vector4.Create(0, 1, 0, 1) * cameraObject.Camera.NearPlane, screenToWorldMatrix).AsVector3();
 
-            return (p0, dpdx, dpdy);
+            return (dir0, dir1 - dir0, dir2 - dir0);
         }
 
         public override void Render(Scene scene)
         {
             if (scene.CameraObjects.Count == 0) return;
 
-            scene.CameraObjects[SelectedCamera].Camera.AspectRatio = (float)Result.PixelWidth / Result.PixelHeight;
+            CameraObject cameraObject = scene.CameraObjects[SelectedCamera];
 
-            (p0, dpdx, dpdy) = GetViewportToWorldParams(float.Pi / 8, scene.CameraObjects[SelectedCamera]);
+            cameraObject.Camera.AspectRatio = (float)Result.PixelWidth / Result.PixelHeight;
+
+            ScreenToWorldParams screenToWorld = GetViewportToWorldParams(cameraObject);
 
             Array.Fill(HDRBuffer.Array, One);
             Array.Fill(ZBuffer.Array, 1);
@@ -277,11 +273,11 @@ namespace CGA2.Renderers
 
             foreach (MeshObject meshObject in scene.MeshObjects)
             {
-                TransformAttributes(scene, meshObject);
+                TransformAttributes(scene, cameraObject, meshObject);
                 Rasterize(meshObject, DrawIntoViewBuffer);
             }
 
-            DrawViewBuffer(scene);
+            DrawViewBuffer(cameraObject, screenToWorld);
             DrawHDRBuffer();
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));

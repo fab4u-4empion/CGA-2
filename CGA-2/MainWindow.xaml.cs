@@ -68,6 +68,8 @@ namespace CGA2
 
             Scene.CameraObjects.Add(cameraObject);
             Scene.Cameras.Add(camera);
+
+            Draw();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
