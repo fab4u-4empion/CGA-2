@@ -247,20 +247,15 @@ namespace CGA2.Renderers
 
         private ScreenToWorldParams GetViewportToWorldParams(CameraObject cameraObject)
         {
-            //Matrix4x4.Invert(cameraObject.ViewMatrix * cameraObject.Camera.ProjectionMatrix * ViewportMatrix, out Matrix4x4 screenToWorldMatrix);
-
-            //Vector3 dir0 = Vector4.Transform(Vector4.Create(0, 0, 0, 1), screenToWorldMatrix).AsVector3() - cameraObject.WorldLocation;
-            //Vector3 dir1 = Vector4.Transform(Vector4.Create(1, 0, 0, 1), screenToWorldMatrix).AsVector3();
-            //Vector3 dir2 = Vector4.Transform(Vector4.Create(0, 1, 0, 1), screenToWorldMatrix).AsVector3();
-
-            //return (dir0, dir1 - dir0, dir2 - dir0);
-
             float aspect = cameraObject.Camera.AspectRatio;
-            float tan = Tan((cameraObject.Camera as PerspectiveCamera).FieldOfView / 2f);
+            float tan = Tan((cameraObject.Camera as PerspectiveCamera)!.FieldOfView / 2f);
+
             Matrix4x4 cameraRotation = Matrix4x4.CreateFromQuaternion(cameraObject.WorldRotation);
+
             Vector3 X = new Vector3(cameraRotation.M11, cameraRotation.M12, cameraRotation.M13) * tan * aspect;
             Vector3 Y = new Vector3(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
             Vector3 Z = new(cameraRotation.M31, cameraRotation.M32, cameraRotation.M33);
+
             Vector3 p0 = (1f / Result.PixelWidth - 1) * X + (-1f / Result.PixelHeight + 1) * Y - Z;
             Vector3 dpdx = X * 2 / Result.PixelWidth;
             Vector3 dpdy = Y * -2 / Result.PixelHeight;
