@@ -13,7 +13,9 @@
         WindowStartupLocation="CenterScreen"
         SizeChanged="Window_SizeChanged"
         KeyDown="Window_KeyDown"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        MouseDown="Window_MouseDown"
+        MouseMove="Window_MouseMove">
     <Grid x:Name="Grid">
         <Image x:Name="Canvas" RenderOptions.BitmapScalingMode="Fant"/>
         <Grid x:Name="UI" Margin="10">

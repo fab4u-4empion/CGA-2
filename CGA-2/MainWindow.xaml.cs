@@ -5,10 +5,12 @@ using CGA2.Renderers;
 using CGA2.Utils;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using static CGA2.Settings;
 
 namespace CGA2
 {
@@ -22,6 +24,8 @@ namespace CGA2
         private DPIScale Scale = (1, 1);
 
         private WindowState LastState;
+
+        private Point MousePosition;
 
         private Stopwatch Timer = new();
 
@@ -69,13 +73,61 @@ namespace CGA2
             Scene.CameraObjects.Add(cameraObject);
             Scene.Cameras.Add(camera);
 
+            Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
+
             Draw();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MousePosition = e.GetPosition(this);
+        }
+
+        private void Window_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point current_position = e.GetPosition(this);
+                Scene.CameraObjects[SelectedCamera].Rotate((float)(current_position.X - MousePosition.X) * -0.0035f, (float)(current_position.Y - MousePosition.Y) * -0.0035f, 0f);
+                Draw();
+            }
+            MousePosition = e.GetPosition(this);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key) 
             {
+                case Key.W:
+                    Scene.CameraObjects[SelectedCamera].Move(-0.2f, 0f, 0f);
+                    Draw();
+                    break;
+
+                case Key.S:
+                    Scene.CameraObjects[SelectedCamera].Move(0.2f, 0f, 0f);
+                    Draw();
+                    break;
+
+                case Key.A:
+                    Scene.CameraObjects[SelectedCamera].Move(0f, -0.2f, 0f);
+                    Draw();
+                    break;
+
+                case Key.D:
+                    Scene.CameraObjects[SelectedCamera].Move(0, 0.2f, 0f);
+                    Draw();
+                    break;
+
+                case Key.Q:
+                    Scene.CameraObjects[SelectedCamera].Move(0f, 0, -0.2f);
+                    Draw();
+                    break;
+
+                case Key.E:
+                    Scene.CameraObjects[SelectedCamera].Move(0, 0f, 0.2f);
+                    Draw();
+                    break;
+
                 case Key.F11:
                     if (!e.IsRepeat)
                     {

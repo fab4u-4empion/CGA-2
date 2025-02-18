@@ -17,7 +17,7 @@ namespace CGA2.Components.Objects
 
         public Matrix4x4 WorldMatrix => CreateScale(Scale) * CreateFromQuaternion(Rotation) * CreateTranslation(Location) * (Parent?.WorldMatrix ?? Identity);
 
-        public Quaternion WorldRotation => Quaternion.Normalize(Rotation * (Parent?.WorldRotation ?? Quaternion.Identity));
+        public Quaternion WorldRotation => Rotation * (Parent?.WorldRotation ?? Quaternion.Identity);
 
         public Vector3 WorldLocation => Location + (Parent?.WorldLocation ?? Vector3.Zero);
     }
