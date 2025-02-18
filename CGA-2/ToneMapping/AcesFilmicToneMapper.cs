@@ -3,7 +3,7 @@ using static System.Numerics.Vector3;
 
 namespace CGA2.ToneMapping
 {
-    public class AcesFilmecToneMapper : ToneMapper
+    public class AcesFilmicToneMapper : ToneMapper
     {
         private static readonly Matrix4x4 ACESInputMat = new
         (
