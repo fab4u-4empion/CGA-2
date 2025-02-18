@@ -240,7 +240,7 @@ namespace CGA2.Renderers
             {
             for (int x = 0; x < HDRBuffer.Width; x++)
                 {
-                    Result.SetPixel(x, y, HDRBuffer[x, y]);
+                    Result.SetPixel(x, y, ToneMapper.CompressColor(HDRBuffer[x, y]));
                 }
             });
         }
@@ -252,9 +252,9 @@ namespace CGA2.Renderers
 
             Matrix4x4 cameraRotation = Matrix4x4.CreateFromQuaternion(cameraObject.WorldRotation);
 
-            Vector3 X = new Vector3(cameraRotation.M11, cameraRotation.M12, cameraRotation.M13) * tan * aspect;
-            Vector3 Y = new Vector3(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
-            Vector3 Z = new(cameraRotation.M31, cameraRotation.M32, cameraRotation.M33);
+            Vector3 X = Create(cameraRotation.M11, cameraRotation.M12, cameraRotation.M13) * tan * aspect;
+            Vector3 Y = Create(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
+            Vector3 Z = Create(cameraRotation.M31, cameraRotation.M32, cameraRotation.M33);
 
             Vector3 p0 = (1f / Result.PixelWidth - 1) * X + (-1f / Result.PixelHeight + 1) * Y - Z;
             Vector3 dpdx = X * 2 / Result.PixelWidth;
