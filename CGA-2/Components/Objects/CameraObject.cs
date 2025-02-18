@@ -14,7 +14,9 @@ namespace CGA2.Components.Objects
 
         public void Rotate(float dYaw, float dPitch, float dRoll)
         {
-            Rotation *= Quaternion.CreateFromYawPitchRoll(dYaw, dPitch, dRoll);
+            Rotation = Rotation * Quaternion.CreateFromYawPitchRoll(0, dPitch, 0);
+            Rotation = Quaternion.CreateFromYawPitchRoll(dYaw, 0, 0) * Rotation;
+            Rotation = Rotation * Quaternion.CreateFromYawPitchRoll(0, 0, dRoll);
         }
 
         public void Move(float dForward, float dSide, float dUp)
