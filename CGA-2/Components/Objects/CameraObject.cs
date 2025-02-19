@@ -2,6 +2,7 @@
 using System.Numerics;
 using static System.Numerics.Matrix4x4;
 using static System.Numerics.Vector3;
+using static System.Single;
 
 namespace CGA2.Components.Objects
 {
@@ -14,9 +15,9 @@ namespace CGA2.Components.Objects
 
         public void Rotate(float dYaw, float dPitch, float dRoll)
         {
-            Rotation = Rotation * Quaternion.CreateFromYawPitchRoll(0, dPitch, 0);
-            Rotation = Quaternion.CreateFromYawPitchRoll(dYaw, 0, 0) * Rotation;
-            Rotation = Rotation * Quaternion.CreateFromYawPitchRoll(0, 0, dRoll);
+            Yaw += dYaw;
+            Pitch = Clamp(Pitch + dPitch, -float.Pi / 2f, float.Pi / 2f);
+            Roll = Clamp(Roll + dRoll, -float.Pi / 2f, float.Pi / 2f);
         }
 
         public void Move(float dForward, float dSide, float dUp)

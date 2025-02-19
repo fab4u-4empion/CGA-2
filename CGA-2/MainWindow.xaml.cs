@@ -131,6 +131,16 @@ namespace CGA2
                     Draw();
                     break;
 
+                case Key.R:
+                    Scene.CameraObjects[SelectedCamera].Rotate(0f, 0, 0.0035f);
+                    Draw();
+                    break;
+
+                case Key.T:
+                    Scene.CameraObjects[SelectedCamera].Rotate(0, 0f, -0.0035f);
+                    Draw();
+                    break;
+
                 case Key.F2:
                     ObjectSettings OSDialog = new(Scene);
                     OSDialog.ShowDialog();

@@ -25,13 +25,9 @@ namespace CGA2.Components.Objects
             {
                 Quaternion q = Quaternion.Normalize(value);
 
-                System.Diagnostics.Debug.WriteLine($"{q}");
-
-                Yaw = Atan2(2 * (q.Y * q.W + q.X + q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
+                Yaw = Atan2(2 * (q.Y * q.W + q.X * q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
                 Pitch = Asin(2 * (q.X * q.W - q.Z * q.Y));
                 Roll = Atan2(2 * (q.Y * q.X + q.W * q.Z), 1f - 2f * (q.X * q.X + q.Z * q.Z));
-
-                System.Diagnostics.Debug.WriteLine($"{Yaw} {Pitch} {Roll}");
             } 
         }
         public Vector3 Scale { get; set; } = Vector3.One;
