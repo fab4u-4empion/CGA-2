@@ -2,6 +2,7 @@
 using CGA2.Components.Cameras;
 using CGA2.Components.Objects;
 using CGA2.Renderers;
+using CGA2.UI.ObjectSettings;
 using CGA2.Utils;
 using Microsoft.Win32;
 using System.Diagnostics;
@@ -71,7 +72,9 @@ namespace CGA2
             };
 
             Scene.CameraObjects.Add(cameraObject);
-            Scene.Cameras.Add(camera);
+            Scene.Cameras.Add(cameraObject.Camera);
+            Scene.RootObjects.Add(cameraObject);
+            Scene.Nodes.Add(cameraObject);
 
             Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
 
@@ -128,6 +131,11 @@ namespace CGA2
                     Draw();
                     break;
 
+                case Key.F2:
+                    ObjectSettings OSDialog = new(Scene);
+                    OSDialog.ShowDialog();
+                    break;
+
                 case Key.F11:
                     if (!e.IsRepeat)
                     {
@@ -159,6 +167,8 @@ namespace CGA2
                         if (dlg.ShowDialog() == true)
                         {
                             GLTFReader.OpenFile(dlg.FileName, Scene);
+                            Scene.RootObjects[1].Location = new(0, -2f, 0);
+                            //Scene.MeshObjects[1].Roll = float.Pi;
                             Draw();
                         }
                     }
