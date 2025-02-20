@@ -1,12 +1,11 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Cameras;
 using CGA2.Components.Objects;
-using System.Collections.ObjectModel;
+using SharpVectors.Converters;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace CGA2.UI.ObjectSettings
 {
@@ -31,29 +30,30 @@ namespace CGA2.UI.ObjectSettings
         {
             TreeViewItem item = new()
             {
-                Tag = component
+                Tag = component,
+                Cursor = Cursors.Hand
             };
 
-            Image img = new()
+            SvgViewbox svg = new()
             {
                 Width = 16,
                 Height = 16
             };
 
             if (component is SceneObject)
-                img.Source = new BitmapImage(new Uri("\\UI\\Images\\empty_orange.png", UriKind.Relative));
+                svg.Source = new("\\UI\\Images\\empty_orange.svg", UriKind.Relative);
 
             if (component is MeshObject)
-                img.Source = new BitmapImage(new Uri("\\UI\\Images\\cube_orange.png", UriKind.Relative));
+                svg.Source = new("\\UI\\Images\\cube_orange.svg", UriKind.Relative);
 
             if (component is Mesh)
-                img.Source = new BitmapImage(new Uri("\\UI\\Images\\cube_green.png", UriKind.Relative));
+                svg.Source = new("\\UI\\Images\\cube_green.svg", UriKind.Relative);
 
             if (component is CameraObject)
-                img.Source = new BitmapImage(new Uri("\\UI\\Images\\camera_orange.png", UriKind.Relative));
+                svg.Source = new("\\UI\\Images\\camera_orange.svg", UriKind.Relative);
 
             if (component is Camera)
-                img.Source = new BitmapImage(new Uri("\\UI\\Images\\camera_green.png", UriKind.Relative));
+                svg.Source = new("\\UI\\Images\\camera_green.svg", UriKind.Relative);
 
             StackPanel content = new()
             {
@@ -61,7 +61,7 @@ namespace CGA2.UI.ObjectSettings
                 Margin = new(0, 1, 0, 1),
             };
 
-            content.Children.Add(img);
+            content.Children.Add(svg);
             content.Children.Add(new TextBlock()
             {
                 Text = component.Name,
@@ -91,6 +91,11 @@ namespace CGA2.UI.ObjectSettings
                 item.Items.Add(CreateTreeViewItemContent(cameraObject.Camera));
 
             return item;
+        }
+
+        private void ObjectsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            
         }
     }
 }

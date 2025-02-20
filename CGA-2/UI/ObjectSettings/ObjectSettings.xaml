@@ -15,7 +15,17 @@
             <ColumnDefinition Width="400"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TreeView Grid.Column="0" x:Name="ObjectsTreeView" Margin="20,20">
+        <TreeView Grid.Column="0" x:Name="ObjectsTreeView" Margin="20,20" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged">
+            <TreeView.Resources>
+                <SolidColorBrush
+                    x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                    Color="#30666666" 
+                />
+                <SolidColorBrush
+                    x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
+                    Color="#000000" 
+                />
+            </TreeView.Resources>
         </TreeView>
     </Grid>
 </Window>
