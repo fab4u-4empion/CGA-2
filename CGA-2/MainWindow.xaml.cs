@@ -177,8 +177,6 @@ namespace CGA2
                         if (dlg.ShowDialog() == true)
                         {
                             GLTFReader.OpenFile(dlg.FileName, Scene);
-                            Scene.RootObjects[1].Location = new(0, -2f, 0);
-                            //Scene.MeshObjects[1].Roll = float.Pi;
                             Draw();
                         }
                     }

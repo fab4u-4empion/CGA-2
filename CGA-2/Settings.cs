@@ -10,6 +10,6 @@ namespace CGA2
 
         public static float Exposure { get; set; } = 1f;
 
-        public static ToneMapper ToneMapper { get; set; } = new AcesFilmicToneMapper();
+        public static ToneMapper ToneMapper { get; set; } = new LinearToneMapper();
     }
 }

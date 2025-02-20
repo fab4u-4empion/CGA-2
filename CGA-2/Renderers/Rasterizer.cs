@@ -6,10 +6,12 @@ using static System.Int32;
 using static System.Single;
 using static CGA2.Settings;
 using static System.Numerics.Vector3;
+using static System.Numerics.Matrix4x4;
 using System.Buffers;
 using System.Collections.Concurrent;
 using CGA2.Utils;
 using CGA2.Components.Cameras;
+using System.Text.RegularExpressions;
 
 namespace CGA2.Renderers
 {
@@ -20,7 +22,7 @@ namespace CGA2.Renderers
     {
         public override Pbgra32Bitmap Result { get; set; } = new(1, 1);
 
-        private Matrix4x4 ViewportMatrix { get; set; } = Matrix4x4.CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
+        private Matrix4x4 ViewportMatrix { get; set; } = CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
 
         private Buffer<SpinLock> Spins = new(0, 0);
         private Buffer<float> ZBuffer = new(0, 0);
@@ -50,8 +52,6 @@ namespace CGA2.Renderers
             Matrix4x4 viewMatrix = cameraObject.ViewMatrix;
             Matrix4x4 projectionMatrix = cameraObject.Camera.ProjectionMatrix;
 
-            Matrix4x4 matrix = worldMatrix * viewMatrix * projectionMatrix;
-
             meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
             meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
             meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
@@ -61,7 +61,7 @@ namespace CGA2.Renderers
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
                     meshObject.WorldPositions[i] = Transform(meshObject.Mesh.Positions[i], worldMatrix);
-                    meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], matrix);
+                    meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], viewMatrix * projectionMatrix);
                 }
             });
 
@@ -69,7 +69,8 @@ namespace CGA2.Renderers
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], meshObject.WorldRotation));
+                    Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
+                    meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], Transpose(invWorldMatrix)));
                 }
             });
         }

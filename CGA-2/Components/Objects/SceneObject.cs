@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using static System.Numerics.Matrix4x4;
 using static System.Single;
+using static System.Numerics.Quaternion;
 
 namespace CGA2.Components.Objects
 {
@@ -23,7 +24,7 @@ namespace CGA2.Components.Objects
             }
             set
             {
-                Quaternion q = Quaternion.Normalize(value);
+                Quaternion q = Normalize(value);
 
                 Yaw = Atan2(2 * (q.Y * q.W + q.X * q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
                 Pitch = Asin(2 * (q.X * q.W - q.Z * q.Y));
@@ -32,7 +33,7 @@ namespace CGA2.Components.Objects
         }
         public Vector3 Scale { get; set; } = Vector3.One;
 
-        public Matrix4x4 WorldMatrix => CreateScale(Scale) * CreateFromQuaternion(Rotation) * CreateTranslation(Location) * (Parent?.WorldMatrix ?? Identity);
+        public Matrix4x4 WorldMatrix => CreateScale(Scale) * CreateFromQuaternion(Rotation) * CreateTranslation(Location) * (Parent?.WorldMatrix ?? Matrix4x4.Identity);
 
         public Quaternion WorldRotation => Rotation * (Parent?.WorldRotation ?? Quaternion.Identity);
 
