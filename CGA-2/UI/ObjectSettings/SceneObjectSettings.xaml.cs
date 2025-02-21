@@ -11,7 +11,7 @@ namespace CGA2.UI.ObjectSettings
     {
         private SceneObject SceneObject { get; set; }
 
-        public event EventHandler OnSave;
+        public event EventHandler? OnSave;
             
         public SceneObjectSettings(SceneObject sceneObject)
         {

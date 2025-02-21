@@ -21,7 +21,7 @@ namespace CGA2.UI.ObjectSettings
 
             Scene = scene;
 
-            UpdateTreeView(this, EventArgs.Empty);
+            UpdateTreeView();
         }
 
         private static TreeViewItem CreateTreeViewItemContent(Component component)
@@ -91,7 +91,7 @@ namespace CGA2.UI.ObjectSettings
             return item;
         }
 
-        private void UpdateTreeView(object sender, EventArgs args)
+        private void UpdateTreeView()
         {
             ObjectsTreeView.Items.Clear();
 
@@ -103,18 +103,26 @@ namespace CGA2.UI.ObjectSettings
             }
         }
 
+        private void UpdateTreeViewItem(object? sender, EventArgs args)
+        {
+            if (ObjectsTreeView.SelectedItem is TreeViewItem selectedItem)
+            {
+                ((selectedItem.Header as StackPanel)!.Children[1] as TextBlock)!.Text = (selectedItem.Tag as Component)!.Name;
+            }
+        }
+
         private void ObjectsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if ((sender as TreeView)!.SelectedItem is TreeViewItem selectedItem)
             {
-                Component component = (selectedItem!.Tag as Component)!;
+                Component component = (Component)selectedItem!.Tag;
 
                 ObjectSettingsStackPanel.Children.Clear();
 
                 if (component is SceneObject)
                 {
-                    SceneObjectSettings sceneObjectSettings = new SceneObjectSettings((component as SceneObject)!);
-                    sceneObjectSettings.OnSave += UpdateTreeView;
+                    SceneObjectSettings sceneObjectSettings = new((SceneObject)component!);
+                    sceneObjectSettings.OnSave += UpdateTreeViewItem;
                     ObjectSettingsStackPanel.Children.Add(sceneObjectSettings);
                 }
             }
