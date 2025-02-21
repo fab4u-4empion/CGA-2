@@ -14,16 +14,14 @@ namespace CGA2.UI.ObjectSettings
     /// </summary>
     public partial class ObjectSettings : Window
     {
+        private Scene Scene { get; set; }
         public ObjectSettings(Scene scene)
         {
             InitializeComponent();
 
-            foreach (SceneObject sceneObject in scene.RootObjects)
-            {
-                TreeViewItem treeViewItem = CreateTreeViewItem(sceneObject);
+            Scene = scene;
 
-                ObjectsTreeView.Items.Add(treeViewItem);
-            }
+            UpdateTreeView(this, EventArgs.Empty);
         }
 
         private static TreeViewItem CreateTreeViewItemContent(Component component)
@@ -93,9 +91,33 @@ namespace CGA2.UI.ObjectSettings
             return item;
         }
 
+        private void UpdateTreeView(object sender, EventArgs args)
+        {
+            ObjectsTreeView.Items.Clear();
+
+            foreach (SceneObject sceneObject in Scene.RootObjects)
+            {
+                TreeViewItem treeViewItem = CreateTreeViewItem(sceneObject);
+
+                ObjectsTreeView.Items.Add(treeViewItem);
+            }
+        }
+
         private void ObjectsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            
+            if ((sender as TreeView)!.SelectedItem is TreeViewItem selectedItem)
+            {
+                Component component = (selectedItem!.Tag as Component)!;
+
+                ObjectSettingsStackPanel.Children.Clear();
+
+                if (component is SceneObject)
+                {
+                    SceneObjectSettings sceneObjectSettings = new SceneObjectSettings((component as SceneObject)!);
+                    sceneObjectSettings.OnSave += UpdateTreeView;
+                    ObjectSettingsStackPanel.Children.Add(sceneObjectSettings);
+                }
+            }
         }
     }
 }

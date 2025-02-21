@@ -15,17 +15,32 @@
             <ColumnDefinition Width="400"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TreeView Grid.Column="0" x:Name="ObjectsTreeView" Margin="20,20" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged">
-            <TreeView.Resources>
-                <SolidColorBrush
-                    x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                    Color="#30666666" 
-                />
-                <SolidColorBrush
-                    x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
-                    Color="#000000" 
-                />
-            </TreeView.Resources>
-        </TreeView>
+        <Grid Grid.Column="0" Margin="20,10,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Objects" HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"/>
+            <TreeView Grid.Row="1" x:Name="ObjectsTreeView" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged">
+                <TreeView.Resources>
+                    <SolidColorBrush
+            x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+            Color="#30666666" 
+        />
+                    <SolidColorBrush
+            x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
+            Color="#000000" 
+        />
+                </TreeView.Resources>
+            </TreeView>
+        </Grid>
+        <Grid Grid.Column="1" Margin="10,10,20,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Properties" HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"/>
+            <StackPanel Grid.Row="1" x:Name="ObjectSettingsStackPanel"/>
+        </Grid>
     </Grid>
 </Window>

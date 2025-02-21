@@ -144,6 +144,7 @@ namespace CGA2
                 case Key.F2:
                     ObjectSettings OSDialog = new(Scene);
                     OSDialog.ShowDialog();
+                    Draw();
                     break;
 
                 case Key.F11:
