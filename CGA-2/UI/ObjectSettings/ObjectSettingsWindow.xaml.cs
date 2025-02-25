@@ -132,6 +132,13 @@ namespace CGA2.UI.ObjectSettings
                     perspectiveCameraSettings.OnSave += UpdateTreeViewItem;
                     ObjectSettingsStackPanel.Children.Add(perspectiveCameraSettings);
                 }
+
+                if (component is Mesh)
+                {
+                    MeshSettings meshSettings = new((Mesh)component!);
+                    meshSettings.OnSave += UpdateTreeViewItem;
+                    ObjectSettingsStackPanel.Children.Add(meshSettings);
+                }
             }
         }
     }
