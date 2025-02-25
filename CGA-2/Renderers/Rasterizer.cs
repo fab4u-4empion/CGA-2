@@ -173,7 +173,7 @@ namespace CGA2.Renderers
             });
         }
 
-        private static Vector3 GetPixelColor(CameraObject cameraObject, ScreenToWorldParams screenToWorld, ViewBufferData objectInfo, int x, int y)
+        private static Vector3 GetPixelColor(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld, ViewBufferData objectInfo, int x, int y)
         {
             int index = objectInfo.Index * 3;
 
@@ -220,17 +220,19 @@ namespace CGA2.Renderers
 
             Vector3 n = u * n1 + v * n2 + w * n3;
 
-            return (Normalize(n) + One) / 2f;
+            Vector3 pw = u * aw + v * bw + w * cw;
+
+            return Max(Dot(n, lightsObjects[0].GetL(pw)), 0) * lightsObjects[0].GetIrradiance(pw);
         }
 
-        private void DrawViewBuffer(CameraObject cameraObject, ScreenToWorldParams screenToWorld)
+        private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld)
         {
             Parallel.For(0, HDRBuffer.Height, (y) =>
             {
                 for (int x = 0; x < HDRBuffer.Width; x++)
                 {
                     if (ViewBuffer[x, y].MeshObject != null)
-                    HDRBuffer[x, y] = GetPixelColor(cameraObject, screenToWorld, ViewBuffer[x, y], x, y);
+                    HDRBuffer[x, y] = GetPixelColor(cameraObject, lightsObjects, screenToWorld, ViewBuffer[x, y], x, y);
                 }
             });
         }
@@ -251,7 +253,7 @@ namespace CGA2.Renderers
             float aspect = cameraObject.Camera.AspectRatio;
             float tan = Tan((cameraObject.Camera as PerspectiveCamera)!.FieldOfView / 2f);
 
-            Matrix4x4 cameraRotation = Matrix4x4.CreateFromQuaternion(cameraObject.WorldRotation);
+            Matrix4x4 cameraRotation = CreateFromQuaternion(cameraObject.WorldRotation);
 
             Vector3 X = Create(cameraRotation.M11, cameraRotation.M12, cameraRotation.M13) * tan * aspect;
             Vector3 Y = Create(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
@@ -286,7 +288,7 @@ namespace CGA2.Renderers
                 Rasterize(meshObject, DrawIntoViewBuffer);
             }
 
-            DrawViewBuffer(cameraObject, screenToWorld);
+            DrawViewBuffer(cameraObject, scene.LightObjects, screenToWorld);
             DrawHDRBuffer();
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));

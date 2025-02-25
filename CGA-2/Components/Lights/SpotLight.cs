@@ -1,4 +1,5 @@
-﻿using static System.Single;
+﻿using System.Numerics;
+using static System.Single;
 
 namespace CGA2.Components.Lights
 {

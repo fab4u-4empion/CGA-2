@@ -1,5 +1,6 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Cameras;
+using CGA2.Components.Lights;
 using CGA2.Components.Objects;
 using CGA2.Renderers;
 using CGA2.UI.ObjectSettings;
@@ -77,6 +78,20 @@ namespace CGA2
             Scene.Nodes.Add(cameraObject);
 
             Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
+
+            Light light = new DistantLight()
+            {
+                Irradiance = 2
+            };
+            LightObject lightObject = new()
+            {
+                Light = light
+            };
+
+            Scene.LightObjects.Add(lightObject);
+            Scene.Lights.Add(light);
+            Scene.RootObjects.Add(lightObject);
+            Scene.Nodes.Add(lightObject);
 
             Draw();
         }

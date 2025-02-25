@@ -1,4 +1,6 @@
-﻿namespace CGA2.Components.Lights
+﻿using System.Numerics;
+
+namespace CGA2.Components.Lights
 {
     public class DistantLight : Light
     {
