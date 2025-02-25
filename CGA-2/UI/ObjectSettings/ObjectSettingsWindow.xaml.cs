@@ -125,6 +125,13 @@ namespace CGA2.UI.ObjectSettings
                     sceneObjectSettings.OnSave += UpdateTreeViewItem;
                     ObjectSettingsStackPanel.Children.Add(sceneObjectSettings);
                 }
+
+                if (component is PerspectiveCamera)
+                {
+                    PerspectiveCameraSettings perspectiveCameraSettings = new((PerspectiveCamera)component!);
+                    perspectiveCameraSettings.OnSave += UpdateTreeViewItem;
+                    ObjectSettingsStackPanel.Children.Add(perspectiveCameraSettings);
+                }
             }
         }
     }
