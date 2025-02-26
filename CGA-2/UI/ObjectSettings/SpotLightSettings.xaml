@@ -42,6 +42,7 @@
             <TextBox x:Name="LightFalloffTextBox" Margin="0,5,0,0" FontWeight="Light"/>
         </StackPanel>
         <StackPanel Grid.Row="5" Margin="0,0,0,20">
+            <Label Content="Color" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,5"/>
             <ui:ColorButton x:Name="LightColorButton"/>
         </StackPanel>
         <Button Grid.Row="6" Background="#198754" BorderBrush="#198754" Content="Save" Click="Button_Click"/>

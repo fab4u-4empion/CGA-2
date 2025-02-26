@@ -71,7 +71,7 @@
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Label Grid.ColumnSpan="5" Content="Location (x, y, z)" FontSize="15" FontWeight="SemiBold"/>
+            <Label Grid.ColumnSpan="5" Content="Scale (x, y, z)" FontSize="15" FontWeight="SemiBold"/>
             <TextBox x:Name="ObjectScaleXTextBox" Grid.Row="2" Grid.Column="0" FontWeight="Light"/>
             <TextBox x:Name="ObjectScaleYTextBox" Grid.Row="2" Grid.Column="2" FontWeight="Light"/>
             <TextBox x:Name="ObjectScaleZTextBox" Grid.Row="2" Grid.Column="4" FontWeight="Light"/>

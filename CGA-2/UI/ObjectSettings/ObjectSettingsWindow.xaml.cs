@@ -36,10 +36,10 @@ namespace CGA2.UI.ObjectSettings
             Path icon = new()
             {
                 Data = Resources["EmptyIcon"] as Geometry,
-                Fill = Brushes.Orange,
+                Fill = Brushes.SandyBrown,
                 Stretch = Stretch.Uniform,
-                Width = 16,
-                Height = 16
+                Width = 20,
+                Height = 20
             };
 
             if (component is MeshObject || component is Mesh)
@@ -52,7 +52,7 @@ namespace CGA2.UI.ObjectSettings
                 icon.Data = Resources["LightIcon"] as Geometry;
 
             if (component is Camera || component is Mesh || component is Light)
-                icon.Fill = Brushes.ForestGreen;
+                icon.Fill = Brushes.LightGreen;
 
             StackPanel content = new()
             {
@@ -64,8 +64,9 @@ namespace CGA2.UI.ObjectSettings
             content.Children.Add(new TextBlock()
             {
                 Text = component.Name,
-                Margin = new(5, 0, 0, 0),
-                FontSize = 14
+                Margin = new(8, 0, 0, 0),
+                FontSize = 15,
+                VerticalAlignment = VerticalAlignment.Center
             });
 
             item.Header = content;
