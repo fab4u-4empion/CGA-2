@@ -3,9 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:CGA2.UI.ObjectSettings"
         mc:Ignorable="d"
         Title="Objects Settings" 
+        Style="{StaticResource MaterialDesignWindow}"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        FontFamily="{materialDesign:MaterialDesignFont}"
         Height="600" 
         Width="800"
         WindowStartupLocation="CenterOwner"
@@ -25,18 +29,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Objects" HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"/>
-            <TreeView Grid.Row="1" x:Name="ObjectsTreeView" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged">
-                <TreeView.Resources>
-                    <SolidColorBrush
-                        x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                        Color="#30666666" 
-                    />
-                    <SolidColorBrush
-                        x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
-                        Color="#000000" 
-                    />
-                </TreeView.Resources>
-            </TreeView>
+            <TreeView Grid.Row="1" x:Name="ObjectsTreeView" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged" Background="#404040"/>
         </Grid>
         <Grid Grid.Column="1" Margin="10,10,20,10">
             <Grid.RowDefinitions>

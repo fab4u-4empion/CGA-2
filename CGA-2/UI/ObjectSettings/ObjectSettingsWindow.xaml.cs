@@ -52,7 +52,7 @@ namespace CGA2.UI.ObjectSettings
                 icon.Data = Resources["LightIcon"] as Geometry;
 
             if (component is Camera || component is Mesh || component is Light)
-                icon.Fill = Brushes.Green;
+                icon.Fill = Brushes.ForestGreen;
 
             StackPanel content = new()
             {

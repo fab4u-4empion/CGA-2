@@ -3,8 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:CGA2.UI.ObjectSettings"
              mc:Ignorable="d" 
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             FontFamily="{materialDesign:MaterialDesignFont}"
              d:DesignWidth="450" Height="Auto">
     <Grid>
         <Grid.RowDefinitions>
@@ -12,78 +16,66 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Height="20" Text="Name" FontSize="15" Margin="0,0,0,3" FontWeight="SemiBold"/>
-            <TextBox x:Name="ObjectNameTextBox" FontSize="14" Padding="0,3"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <Label Content="Name" FontWeight="SemiBold" FontSize="15"/>
+            <TextBox x:Name="ObjectNameTextBox" Margin="0,5,0,0" FontWeight="Light"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="0,0,0,10">
-            <TextBlock Height="20" Text="Location" FontSize="15" FontWeight="SemiBold"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Height="15" Text="X" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectXTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,5,0">
-                    <TextBlock Height="15" Text="Y" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectYTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Height="15" Text="Z" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectZTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <StackPanel Grid.Row="2" Margin="0,0,0,10">
-            <TextBlock Height="20" Text="Rotation" FontSize="15" FontWeight="SemiBold"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Height="15" Text="Yaw" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectYawTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,5,0">
-                    <TextBlock Height="15" Text="Pitch" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectPitchTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Height="15" Text="Roll" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectRollTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <StackPanel Grid.Row="3" Margin="0,0,0,10">
-            <TextBlock Height="20" Text="Scale" FontSize="15" FontWeight="SemiBold"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Height="15" Text="X" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectScaleXTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,5,0">
-                    <TextBlock Height="15" Text="Y" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectScaleYTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Height="15" Text="Z" FontSize="13" Margin="0,0,0,3"/>
-                    <TextBox x:Name="ObjectScaleZTextBox" FontSize="14" Padding="0,3"/>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <Button Grid.Row="4" Height="30" FontSize="15" Content="Save" VerticalAlignment="Bottom" Click="Button_Click"/>
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.ColumnSpan="5" Content="Location (x, y, z)" FontSize="15" FontWeight="SemiBold"/>
+            <TextBox x:Name="ObjectXTextBox" Grid.Row="2" Grid.Column="0" FontWeight="Light"/>
+            <TextBox x:Name="ObjectYTextBox" Grid.Row="2" Grid.Column="2" FontWeight="Light"/>
+            <TextBox x:Name="ObjectZTextBox" Grid.Row="2" Grid.Column="4" FontWeight="Light"/>
+        </Grid>
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.ColumnSpan="5" Content="Rotation (yaw, pitch, roll)" FontSize="15" FontWeight="SemiBold"/>
+            <TextBox x:Name="ObjectYawTextBox" Grid.Row="2" Grid.Column="0" FontWeight="Light"/>
+            <TextBox x:Name="ObjectPitchTextBox" Grid.Row="2" Grid.Column="2" FontWeight="Light"/>
+            <TextBox x:Name="ObjectRollTextBox" Grid.Row="2" Grid.Column="4" FontWeight="Light"/>
+        </Grid>
+        <Grid Grid.Row="3" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.ColumnSpan="5" Content="Location (x, y, z)" FontSize="15" FontWeight="SemiBold"/>
+            <TextBox x:Name="ObjectScaleXTextBox" Grid.Row="2" Grid.Column="0" FontWeight="Light"/>
+            <TextBox x:Name="ObjectScaleYTextBox" Grid.Row="2" Grid.Column="2" FontWeight="Light"/>
+            <TextBox x:Name="ObjectScaleZTextBox" Grid.Row="2" Grid.Column="4" FontWeight="Light"/>
+        </Grid>
+        <Button Grid.Row="4" Background="#198754" BorderBrush="#198754" Content="Save" Click="Button_Click"/>
     </Grid>
 </UserControl>
