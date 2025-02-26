@@ -15,30 +15,10 @@
 		<Content Include="AgX_Base_sRGB.cube">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="UI\Images\cube_orange.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="UI\Images\cube_green.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="UI\Images\camera_orange.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="UI\Images\camera_green.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="UI\Images\empty_orange.svg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpVectors" Version="1.8.4.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UI\Images\" />
   </ItemGroup>
 
 </Project>

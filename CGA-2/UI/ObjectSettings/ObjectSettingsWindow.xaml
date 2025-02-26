@@ -9,7 +9,11 @@
         Height="600" 
         Width="800"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+>
+    <Window.Resources>
+        <ResourceDictionary Source="/UI/ObjectSettings/IconDictionary.xaml"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>

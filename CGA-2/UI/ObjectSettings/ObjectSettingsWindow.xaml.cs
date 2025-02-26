@@ -1,11 +1,12 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Cameras;
+using CGA2.Components.Lights;
 using CGA2.Components.Objects;
-using SharpVectors.Converters;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace CGA2.UI.ObjectSettings
 {
@@ -24,7 +25,7 @@ namespace CGA2.UI.ObjectSettings
             UpdateTreeView();
         }
 
-        private static TreeViewItem CreateTreeViewItemContent(Component component)
+        private TreeViewItem CreateTreeViewItemContent(Component component)
         {
             TreeViewItem item = new()
             {
@@ -32,26 +33,26 @@ namespace CGA2.UI.ObjectSettings
                 Cursor = Cursors.Hand
             };
 
-            SvgViewbox svg = new()
+            Path icon = new()
             {
+                Data = Resources["EmptyIcon"] as Geometry,
+                Fill = Brushes.Orange,
+                Stretch = Stretch.Uniform,
                 Width = 16,
                 Height = 16
             };
 
-            if (component is SceneObject)
-                svg.Source = new("\\UI\\Images\\empty_orange.svg", UriKind.Relative);
+            if (component is MeshObject || component is Mesh)
+                icon.Data = Resources["MeshIcon"] as Geometry;
 
-            if (component is MeshObject)
-                svg.Source = new("\\UI\\Images\\cube_orange.svg", UriKind.Relative);
+            if (component is CameraObject || component is Camera)
+                icon.Data = Resources["CameraIcon"] as Geometry;
 
-            if (component is Mesh)
-                svg.Source = new("\\UI\\Images\\cube_green.svg", UriKind.Relative);
+            if (component is LightObject || component is Light)
+                icon.Data = Resources["LightIcon"] as Geometry;
 
-            if (component is CameraObject)
-                svg.Source = new("\\UI\\Images\\camera_orange.svg", UriKind.Relative);
-
-            if (component is Camera)
-                svg.Source = new("\\UI\\Images\\camera_green.svg", UriKind.Relative);
+            if (component is Camera || component is Mesh || component is Light)
+                icon.Fill = Brushes.Green;
 
             StackPanel content = new()
             {
@@ -59,7 +60,7 @@ namespace CGA2.UI.ObjectSettings
                 Margin = new(0, 1, 0, 1),
             };
 
-            content.Children.Add(svg);
+            content.Children.Add(icon);
             content.Children.Add(new TextBlock()
             {
                 Text = component.Name,
@@ -72,7 +73,7 @@ namespace CGA2.UI.ObjectSettings
             return item;
         }
 
-        private static TreeViewItem CreateTreeViewItem(SceneObject sceneObject)
+        private TreeViewItem CreateTreeViewItem(SceneObject sceneObject)
         {
             TreeViewItem item = CreateTreeViewItemContent(sceneObject);
 
@@ -87,6 +88,9 @@ namespace CGA2.UI.ObjectSettings
 
             if (sceneObject is CameraObject cameraObject)
                 item.Items.Add(CreateTreeViewItemContent(cameraObject.Camera));
+
+            if (sceneObject is LightObject lightObject)
+                item.Items.Add(CreateTreeViewItemContent(lightObject.Light));
 
             return item;
         }
