@@ -7,7 +7,6 @@ using CGA2.UI.ObjectSettings;
 using CGA2.Utils;
 using Microsoft.Win32;
 using System.Diagnostics;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -81,7 +80,7 @@ namespace CGA2
 
             Light light = new DistantLight()
             {
-                Irradiance = 2
+                
             };
             LightObject lightObject = new()
             {

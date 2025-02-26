@@ -21,9 +21,9 @@ namespace CGA2.UI.ObjectSettings
             InitializeComponent();
 
             CameraNameTextBox.Text = camera.Name;
-            CameraNearPlaneTextBox.Text = camera.NearPlane.ToString(CultureInfo.InvariantCulture);
-            CameraFarPlaneTextBox.Text = camera.FarPlane.ToString(CultureInfo.InvariantCulture);
-            CameraFoVTextBox.Text = RadiansToDegrees(camera.FieldOfView).ToString(CultureInfo.InvariantCulture);
+            CameraNearPlaneTextBox.Text = camera.NearPlane.ToString("0.###", CultureInfo.InvariantCulture);
+            CameraFarPlaneTextBox.Text = camera.FarPlane.ToString("0.###", CultureInfo.InvariantCulture);
+            CameraFoVTextBox.Text = RadiansToDegrees(camera.FieldOfView).ToString("0.###", CultureInfo.InvariantCulture);
 
             Camera = camera;
         }

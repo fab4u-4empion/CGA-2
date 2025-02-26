@@ -143,6 +143,29 @@ namespace CGA2.UI.ObjectSettings
                     meshSettings.OnSave += UpdateTreeViewItem;
                     ObjectSettingsStackPanel.Children.Add(meshSettings);
                 }
+
+                if (component is DistantLight)
+                {
+                    DistantLightSettings distLightSettings = new((DistantLight)component!);
+                    distLightSettings.OnSave += UpdateTreeViewItem;
+                    ObjectSettingsStackPanel.Children.Add(distLightSettings);
+                }
+
+                if (component is SphericalLight)
+                {
+                    if (component is SpotLight)
+                    {
+                        SpotLightSettings sptLightSettings = new((SpotLight)component!);
+                        sptLightSettings.OnSave += UpdateTreeViewItem;
+                        ObjectSettingsStackPanel.Children.Add(sptLightSettings);
+                    } 
+                    else
+                    {
+                        SphericalLightSettings sphLightSettings = new((SphericalLight)component!);
+                        sphLightSettings.OnSave += UpdateTreeViewItem;
+                        ObjectSettingsStackPanel.Children.Add(sphLightSettings);
+                    }
+                }
             }
         }
     }

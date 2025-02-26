@@ -20,17 +20,17 @@ namespace CGA2.UI.ObjectSettings
 
             ObjectNameTextBox.Text = sceneObject.Name;
 
-            ObjectYawTextBox.Text = RadiansToDegrees(sceneObject.Yaw).ToString(CultureInfo.InvariantCulture);
-            ObjectPitchTextBox.Text = RadiansToDegrees(sceneObject.Pitch).ToString(CultureInfo.InvariantCulture);
-            ObjectRollTextBox.Text = RadiansToDegrees(sceneObject.Roll).ToString(CultureInfo.InvariantCulture);
+            ObjectYawTextBox.Text = RadiansToDegrees(sceneObject.Yaw).ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectPitchTextBox.Text = RadiansToDegrees(sceneObject.Pitch).ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectRollTextBox.Text = RadiansToDegrees(sceneObject.Roll).ToString("0.###", CultureInfo.InvariantCulture);
 
-            ObjectXTextBox.Text = sceneObject.Location.X.ToString(CultureInfo.InvariantCulture);
-            ObjectYTextBox.Text = sceneObject.Location.Y.ToString(CultureInfo.InvariantCulture);
-            ObjectZTextBox.Text = sceneObject.Location.Z.ToString(CultureInfo.InvariantCulture);
+            ObjectXTextBox.Text = sceneObject.Location.X.ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectYTextBox.Text = sceneObject.Location.Y.ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectZTextBox.Text = sceneObject.Location.Z.ToString("0.###", CultureInfo.InvariantCulture);
 
-            ObjectScaleXTextBox.Text = sceneObject.Scale.X.ToString(CultureInfo.InvariantCulture);
-            ObjectScaleYTextBox.Text = sceneObject.Scale.Y.ToString(CultureInfo.InvariantCulture);
-            ObjectScaleZTextBox.Text = sceneObject.Scale.Z.ToString(CultureInfo.InvariantCulture);
+            ObjectScaleXTextBox.Text = sceneObject.Scale.X.ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectScaleYTextBox.Text = sceneObject.Scale.Y.ToString("0.###", CultureInfo.InvariantCulture);
+            ObjectScaleZTextBox.Text = sceneObject.Scale.Z.ToString("0.###", CultureInfo.InvariantCulture);
 
             SceneObject = sceneObject;
         }
