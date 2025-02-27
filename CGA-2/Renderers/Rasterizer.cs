@@ -11,7 +11,6 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using CGA2.Utils;
 using CGA2.Components.Cameras;
-using System.Text.RegularExpressions;
 
 namespace CGA2.Renderers
 {
@@ -222,7 +221,12 @@ namespace CGA2.Renderers
 
             Vector3 pw = u * aw + v * bw + w * cw;
 
-            return Max(Dot(n, lightsObjects[0].GetL(pw)), 0) * lightsObjects[0].GetIrradiance(pw);
+            Vector3 color = Zero;
+
+            foreach (LightObject lightObject in lightsObjects)
+                color += Max(Dot(n, lightObject.GetL(pw)), 0) * lightObject.GetIrradiance(pw);
+
+            return color;
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld)
