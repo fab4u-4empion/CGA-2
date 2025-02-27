@@ -23,7 +23,6 @@ namespace CGA2.Utils
             List<byte[]> buffers = [];
 
             List<Mesh> meshes = [];
-            List<Camera> cameras = [];
             List<Light> lights = [];
             List<SceneObject> nodes = [];
 
@@ -140,7 +139,7 @@ namespace CGA2.Utils
                     if (gltfNode["camera"] != null)
                         newNode = new CameraObject()
                         {
-                            Camera = cameras[(int)gltfNode["camera"]]
+                            Camera = new PerspectiveCamera()
                         };
 
                     if (gltfNode["extensions"] != null)
@@ -230,7 +229,6 @@ namespace CGA2.Utils
 
             scene.Meshes.AddRange(meshes);
             scene.Lights.AddRange(lights);
-            scene.Cameras.AddRange(cameras);
             scene.Nodes.AddRange(nodes);
         }
     }
