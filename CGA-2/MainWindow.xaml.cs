@@ -78,7 +78,7 @@ namespace CGA2
 
             Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
 
-            Light light = new DistantLight()
+            Light light = new SpotLight()
             {
                 
             };

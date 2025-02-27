@@ -7,6 +7,6 @@ namespace CGA2.Components.Lights
     {
         public override string Name { get; set; } = "SpotLight";
         public float Angle { get; set; } = Pi / 4;
-        public float Falloff { get; set; } = 0.25f;
+        public float Falloff { get; set; } = 0f;
     }
 }
