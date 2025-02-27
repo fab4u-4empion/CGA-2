@@ -19,6 +19,6 @@
             <Label Content="Name" FontWeight="SemiBold" FontSize="15"/>
             <TextBox x:Name="MeshNameTextBox" Margin="0,5,0,0" FontWeight="Light"/>
         </StackPanel>
-        <Button Grid.Row="1" Background="#198754" BorderBrush="#198754" Content="Save" VerticalAlignment="Bottom" Click="Button_Click"/>
+        <Button Grid.Row="1" Background="#198754" BorderBrush="#198754" Content="Save" VerticalAlignment="Bottom" Click="Button_Save_Click"/>
     </Grid>
 </UserControl>

@@ -66,7 +66,9 @@ namespace CGA2.UI.ObjectSettings
                 Text = component.Name,
                 Margin = new(8, 0, 0, 0),
                 FontSize = 15,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                MaxWidth = 200
             });
 
             item.Header = content;
@@ -116,18 +118,30 @@ namespace CGA2.UI.ObjectSettings
             }
         }
 
+        private void DeleteItem(object? sender, EventArgs args)
+        {
+            if (ObjectsTreeView.SelectedItem is TreeViewItem selectedItem)
+            {
+                SceneObject sceneObject = (SceneObject)selectedItem.Tag;
+
+                if (Scene.DeleteSceneObject(sceneObject))
+                    UpdateTreeView();
+            }
+        }
+
         private void ObjectsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            ObjectSettingsStackPanel.Children.Clear();
+
             if ((sender as TreeView)!.SelectedItem is TreeViewItem selectedItem)
             {
                 Component component = (Component)selectedItem!.Tag;
-
-                ObjectSettingsStackPanel.Children.Clear();
 
                 if (component is SceneObject)
                 {
                     SceneObjectSettings sceneObjectSettings = new((SceneObject)component!);
                     sceneObjectSettings.OnSave += UpdateTreeViewItem;
+                    sceneObjectSettings.OnDelete += DeleteItem;
                     ObjectSettingsStackPanel.Children.Add(sceneObjectSettings);
                 }
 

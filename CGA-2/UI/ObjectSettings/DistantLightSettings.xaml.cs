@@ -29,7 +29,7 @@ namespace CGA2.UI.ObjectSettings
             Light = light;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Save_Click(object sender, RoutedEventArgs e)
         {
             Light.Angle = Clamp(Parse(LightAngleTextBox.Text, CultureInfo.InvariantCulture), 0f, 90f);
             Light.Irradiance = Max(Parse(LightIrradianceTextBox.Text, CultureInfo.InvariantCulture), 0f);

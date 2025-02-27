@@ -28,7 +28,7 @@ namespace CGA2.UI.ObjectSettings
             Camera = camera;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Save_Click(object sender, RoutedEventArgs e)
         {
             Camera.Name = CameraNameTextBox.Text;
             Camera.NearPlane = Parse(CameraNearPlaneTextBox.Text, CultureInfo.InvariantCulture);

@@ -1,6 +1,7 @@
 ﻿using CGA2.Components.Objects;
 using System.Globalization;
 using System.Windows.Controls;
+using System.Windows;
 using static System.Single;
 
 namespace CGA2.UI.ObjectSettings
@@ -13,6 +14,8 @@ namespace CGA2.UI.ObjectSettings
         private SceneObject SceneObject { get; set; }
 
         public event EventHandler? OnSave;
+
+        public event EventHandler? OnDelete;
             
         public SceneObjectSettings(SceneObject sceneObject)
         {
@@ -32,10 +35,13 @@ namespace CGA2.UI.ObjectSettings
             ObjectScaleYTextBox.Text = sceneObject.Scale.Y.ToString("0.###", CultureInfo.InvariantCulture);
             ObjectScaleZTextBox.Text = sceneObject.Scale.Z.ToString("0.###", CultureInfo.InvariantCulture);
 
+            if (sceneObject is CameraObject)
+                ButtonDelete.Visibility = Visibility.Hidden;
+
             SceneObject = sceneObject;
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Button_Save_Click(object sender, RoutedEventArgs e)
         {
             SceneObject.Name = ObjectNameTextBox.Text;
 
@@ -60,6 +66,11 @@ namespace CGA2.UI.ObjectSettings
             );
 
             OnSave?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void Button_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            OnDelete?.Invoke(this, EventArgs.Empty);
         }
     }
 }

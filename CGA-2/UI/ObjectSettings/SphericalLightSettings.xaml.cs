@@ -28,7 +28,7 @@ namespace CGA2.UI.ObjectSettings
             Light = light;
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Button_Save_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Light.Power = Max(Parse(LightPowerTextBox.Text, CultureInfo.InvariantCulture), 0f);
             Light.Radius = Max(Parse(LightRadiusTextBox.Text, CultureInfo.InvariantCulture), 0f);

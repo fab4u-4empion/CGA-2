@@ -35,6 +35,6 @@
             <Label Content="FoV" FontSize="15" FontWeight="SemiBold"/>
             <TextBox x:Name="CameraFoVTextBox" Margin="0,5,0,0" FontWeight="Light"/>
         </StackPanel>
-        <Button Grid.Row="4" Background="#198754" BorderBrush="#198754" Content="Save" Click="Button_Click"/>
+        <Button Grid.Row="4" Background="#198754" BorderBrush="#198754" Content="Save" Click="Button_Save_Click"/>
     </Grid>
 </UserControl>

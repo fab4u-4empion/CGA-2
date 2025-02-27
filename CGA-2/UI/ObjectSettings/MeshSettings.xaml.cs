@@ -22,7 +22,7 @@ namespace CGA2.UI.ObjectSettings
             Mesh = mesh;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Save_Click(object sender, RoutedEventArgs e)
         {
             Mesh.Name = MeshNameTextBox.Text;
 
