@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows.Controls;
 using static CGA2.Utils.Vector3ToColorConverter;
 using static System.Single;
+using static CGA2.ToneMapping.ToneMapper;
 
 namespace CGA2.UI.ObjectSettings
 {
@@ -22,7 +23,7 @@ namespace CGA2.UI.ObjectSettings
             LightNameTextBox.Text = light.Name;
             LightPowerTextBox.Text = light.Power.ToString("0.###", CultureInfo.InvariantCulture);
             LightRadiusTextBox.Text = light.Radius.ToString("0.###", CultureInfo.InvariantCulture);
-            LightColorButton.Color = Vector3ToColor(light.Color);
+            LightColorButton.Color = Vector3ToColor(LinearToSrgb(light.Color));
 
             Light = light;
         }
@@ -32,7 +33,7 @@ namespace CGA2.UI.ObjectSettings
             Light.Power = Max(Parse(LightPowerTextBox.Text, CultureInfo.InvariantCulture), 0f);
             Light.Radius = Max(Parse(LightRadiusTextBox.Text, CultureInfo.InvariantCulture), 0f);
             Light.Name = LightNameTextBox.Text;
-            Light.Color = ColorToVector3(LightColorButton.Color);
+            Light.Color = SrgbToLinear(ColorToVector3(LightColorButton.Color));
 
             OnSave?.Invoke(this, EventArgs.Empty);
         }
