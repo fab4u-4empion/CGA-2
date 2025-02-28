@@ -19,6 +19,9 @@ namespace CGA2.ToneMapping
             Create(color.X <= 0.0031308f ? 12.92f * color.X : 1.055f * Pow(color.X, 1 / 2.4f) - 0.055f,
                    color.Y <= 0.0031308f ? 12.92f * color.Y : 1.055f * Pow(color.Y, 1 / 2.4f) - 0.055f,
                    color.Z <= 0.0031308f ? 12.92f * color.Z : 1.055f * Pow(color.Z, 1 / 2.4f) - 0.055f);
+
+        public abstract string Name { get; set; }
+
         public abstract Vector3 CompressColor(Vector3 color);
         protected static Vector3 CompressColor(Vector3 color, Func<Vector3, Vector3> callBack)
         {

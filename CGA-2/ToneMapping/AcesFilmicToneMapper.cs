@@ -5,6 +5,8 @@ namespace CGA2.ToneMapping
 {
     public class AcesFilmicToneMapper : ToneMapper
     {
+        public override string Name { get; set; } = "ACES";
+
         private static readonly Matrix4x4 ACESInputMat = new
         (
             0.59719f, 0.07600f, 0.02840f, 0f,

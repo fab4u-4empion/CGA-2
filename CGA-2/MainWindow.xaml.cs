@@ -3,6 +3,7 @@ using CGA2.Components.Cameras;
 using CGA2.Components.Lights;
 using CGA2.Components.Objects;
 using CGA2.Renderers;
+using CGA2.UI;
 using CGA2.UI.ObjectSettings;
 using CGA2.Utils;
 using Microsoft.Win32;
@@ -38,14 +39,21 @@ namespace CGA2
             InitializeComponent();
         }
 
+        private void UpdateInfo()
+        {
+            ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
+            RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
+
+            TonemappingInfo.Text = ToneMapper.Name;
+        }
+
         private void Draw()
         {
             Timer.Restart();
             Renderer.Render(Scene);
             Timer.Stop();
 
-            ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
-            RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
+            UpdateInfo();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -158,6 +166,13 @@ namespace CGA2
                 case Key.F2:
                     ObjectSettings OSDialog = new(Scene);
                     OSDialog.ShowDialog();
+                    Draw();
+                    break;
+
+                case Key.F3:
+                    ImageSettings imgSettings = new();
+                    imgSettings.ShowDialog();
+                    Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
                     Draw();
                     break;
 

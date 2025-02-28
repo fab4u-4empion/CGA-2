@@ -6,7 +6,10 @@ namespace CGA2.ToneMapping
 {
     public class ReinhardToneMapper : ToneMapper
     {
+        public override string Name { get; set; } = "Reinhard";
+
         private static Vector3 Reinhard(Vector3 color) => color / (One + color);
+
         public override Vector3 CompressColor(Vector3 color) => CompressColor(color, Reinhard);
     }
 }

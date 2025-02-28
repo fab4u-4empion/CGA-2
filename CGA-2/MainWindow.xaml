@@ -29,6 +29,14 @@
             <Border Padding="8,5" CornerRadius="4" VerticalAlignment="Top" HorizontalAlignment="Right" Background="#A0000000">
                 <TextBlock x:Name="RenderTimeTextBlock" Text="Time" Foreground="#FFFFFF"/>
             </Border>
+            <Border Padding="8,5" CornerRadius="4" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#A0000000">
+                <StackPanel>
+                    <TextBlock Foreground="{DynamicResource MaterialDesign.Brush.Foreground}">
+                        <Run Text="Tonemapping: " Foreground="Gray"/>
+                        <Run x:Name="TonemappingInfo" Text="text"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -6,6 +6,8 @@ namespace CGA2.ToneMapping
 {
     public class AgXToneMapper : ToneMapper
     {
+        public override string Name { get; set; } = "AgX";
+
         private static readonly Matrix4x4 LinearRec709ToLinearFilmLightEGamut = new
         (
             0.5594630473276861f, 0.0762332608733703f, 0.0655375095152927f, 0f,

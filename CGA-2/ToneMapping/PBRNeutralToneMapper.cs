@@ -6,6 +6,8 @@ namespace CGA2.ToneMapping
 {
     public class PBRNeutralToneMapper : ToneMapper
     {
+        public override string Name { get; set; } = "PBRNeutral";
+
         private static Vector3 PBRNeutral(Vector3 color)
         {
             const float startCompression = 0.8f - 0.04f;
