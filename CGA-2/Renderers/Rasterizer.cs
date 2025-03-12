@@ -1,7 +1,6 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Objects;
 using System.Numerics;
-using Utils;
 using static System.Int32;
 using static System.Single;
 using static CGA2.Settings;
@@ -19,7 +18,7 @@ namespace CGA2.Renderers
 
     public class Rasterizer : Renderer
     {
-        public override Pbgra32Bitmap Result { get; set; } = new(1, 1);
+        public override Bgra32Bitmap Result { get; set; } = new(1, 1);
 
         private Matrix4x4 ViewportMatrix { get; set; } = CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
 
