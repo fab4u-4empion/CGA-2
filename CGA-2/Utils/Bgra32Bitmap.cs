@@ -74,7 +74,7 @@ namespace CGA2.Utils
 
         public void SetPixel(int x, int y, Vector3 color)
         {
-            SetPixel(x, y, new Vector4(color, 255));
+            SetPixel(x, y, new Vector4(color, 1));
         }
 
         public void ClearPixel(int x, int y)
