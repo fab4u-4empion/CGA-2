@@ -18,7 +18,7 @@ namespace CGA2.ToneMapping
 
         private static readonly Vector3 AgXMinEV = Create(-12.47393f);
         private static readonly Vector3 AgXMaxEV = Create(12.5260688117f);
-        private static readonly Lut3D AgXBaseSrgb = new("AgX_Base_sRGB.cube");
+        private static readonly Lut3D AgXBaseSrgb = new("Assets\\AgX_Base_sRGB.cube");
 
         private static Vector3 AgX(Vector3 color)
         {

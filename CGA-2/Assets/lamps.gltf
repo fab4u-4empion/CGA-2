@@ -1,0 +1,88 @@
+{
+  "extensions": {
+    "KHR_lights_punctual": {
+      "lights": [
+        {
+          "name": "Pink",
+          "color": [
+            1.0,
+            0.5,
+            1.0
+          ],
+          "type": "point",
+          "intensity": 500,
+        },
+        {
+          "name": "PaleGreen",
+          "color": [
+            0.5,
+            1,
+            0.5
+          ],
+          "type": "point",
+          "intensity": 500
+        },
+        {
+          "name": "Lavender",
+          "color": [
+            0.5,
+            0.5,
+            1.0
+          ],
+          "type": "point",
+          "intensity": 500
+        },
+        {
+          "name": "Aquamarine",
+          "color": [
+            0.5,
+            1,
+            1.0
+          ],
+          "type": "point",
+          "intensity": 500
+        }
+
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "name": "Default 1",
+      "translation": [ 10, 10, 10 ],
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 0
+        }
+      }
+    },
+    {
+      "name": "Default 2",
+      "translation": [ -10, 10, 10 ],
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 1
+        }
+      }
+    },
+    {
+      "name": "Default 3",
+      "translation": [ 10, 10, -10 ],
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 2
+        }
+      }
+    },
+    {
+      "name": "Default 4",
+      "translation": [ -10, 10, -10 ],
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 3
+        }
+      }
+    }
+
+  ]
+}

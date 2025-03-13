@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using CGA2.Components.Materials;
+using System.Numerics;
 
 namespace CGA2.Components
 {
@@ -10,5 +11,6 @@ namespace CGA2.Components
         public List<Vector3> Normals = [];
         public List<Vector2> UVs = [];
         public List<ushort> Triangles = [];
+        public List<Material> Materials = [];
     }
 }

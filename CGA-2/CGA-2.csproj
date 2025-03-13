@@ -12,7 +12,10 @@
   </PropertyGroup>
 	
 	<ItemGroup>
-		<Content Include="AgX_Base_sRGB.cube">
+		<Content Include="Assets\AgX_Base_sRGB.cube">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\lamps.gltf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

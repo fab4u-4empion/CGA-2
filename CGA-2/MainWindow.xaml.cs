@@ -86,19 +86,7 @@ namespace CGA2
 
             Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
 
-            Light light = new SpotLight()
-            {
-                
-            };
-            LightObject lightObject = new()
-            {
-                Light = light
-            };
-
-            Scene.LightObjects.Add(lightObject);
-            Scene.Lights.Add(light);
-            Scene.RootObjects.Add(lightObject);
-            Scene.Nodes.Add(lightObject);
+            GLTFReader.OpenFile("Assets\\lamps.gltf", Scene);
 
             Draw();
         }
