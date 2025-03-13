@@ -116,7 +116,7 @@ namespace CGA2.Components.Materials.Textures
             float lod = Clamp(Log2(max / aniso), 0, MIP.Count - 1);
 
             int mainLod = (int)lod;
-            int nextLod = Min(mainLod + 1, MIP.Count);
+            int nextLod = Min(mainLod + 1, MIP.Count - 1);
 
             (Vector2 a, Vector2 b) = length1 > length2 ? (uv, uv1) : (uv, uv2);
 

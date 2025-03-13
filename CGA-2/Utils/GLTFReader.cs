@@ -1,18 +1,43 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Cameras;
 using CGA2.Components.Lights;
+using CGA2.Components.Materials;
+using CGA2.Components.Materials.Textures;
 using CGA2.Components.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Numerics;
+using System.Windows.Media.Imaging;
 
 namespace CGA2.Utils
 {
     public class GLTFReader
     {
+        private enum TextureTypes
+        {
+            RGB,
+            NonColor,
+            Normal
+        }
+
+        private static Texture LoadTexture(string directory, JToken gltfData, int index, TextureTypes type = TextureTypes.NonColor)
+        {
+            Texture texture = new NonColorTexture();
+
+            JToken gltfImageURI = gltfData["images"][(int)gltfData["textures"][index]["source"]]["uri"];
+
+            if (type == TextureTypes.RGB)
+                texture = new RGBATexture();
+
+            if (type == TextureTypes.Normal)
+                texture = new NormalTexture();
+
+            texture.Create(new(new BitmapImage(new Uri(Path.Combine(directory, (string)gltfImageURI), UriKind.Absolute))));
+
+            return texture;
+        }
+
         public static void OpenFile(string path, Scene scene)
         {
             string directory = Path.GetDirectoryName(path)!;
@@ -31,9 +56,118 @@ namespace CGA2.Utils
             List<LightObject> lightObjects = [];
             List<SceneObject> rootObjects = [];
 
+            List<Material> materials = [];
+
+            List<Texture> textures = [];
+
+            if (gltfData["textures"] != null)
+                textures.AddRange(new Texture[gltfData["textures"].Count()]);
+
             if (gltfData["buffers"] != null)
                 foreach (JToken gltfBuffer in gltfData["buffers"])
                     buffers.Add(File.ReadAllBytes(Path.Combine(directory, (string)gltfBuffer["uri"])));
+
+            if (gltfData["materials"] != null)
+                foreach (JToken gltfMaterial in gltfData["materials"])
+                {
+                    Material material = new()
+                    {
+                        Name = (string)gltfMaterial["name"]
+                    };
+
+                    if (gltfMaterial["normalTexture"] != null)
+                    {
+                        int index = (int)gltfMaterial["normalTexture"]["index"];
+
+                        if (textures[index] == null)
+                            textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.Normal);
+
+                        material.NormalTexture = (NormalTexture)textures[index];
+                    }
+
+                    if (gltfMaterial["occlusionTexture"] != null)
+                    {
+                        int index = (int)gltfMaterial["occlusionTexture"]["index"];
+
+                        if (textures[index] == null)
+                            textures[index] = LoadTexture(directory, gltfData, index);
+
+                        material.OcclusionTexture = (NonColorTexture)textures[index];
+                    }
+
+                    if (gltfMaterial["emissiveTexture"] != null)
+                    {
+                        int index = (int)gltfMaterial["emissiveTexture"]["index"];
+
+                        if (textures[index] == null)
+                            textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.RGB);
+
+                        material.EmissiveTexture = (RGBATexture)textures[index];
+                    }
+
+                    if (gltfMaterial["pbrMetallicRoughness"] != null)
+                    {
+                        if (gltfMaterial["pbrMetallicRoughness"]["baseColorTexture"] != null)
+                        {
+                            int index = (int)gltfMaterial["pbrMetallicRoughness"]["baseColorTexture"]["index"];
+
+                            if (textures[index] == null)
+                                textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.RGB);
+
+                            material.BaseColorTexture = (RGBATexture)textures[index];
+                        }
+
+                        if (gltfMaterial["pbrMetallicRoughness"]["metallicRoughnessTexture"] != null)
+                        {
+                            int index = (int)gltfMaterial["pbrMetallicRoughness"]["metallicRoughnessTexture"]["index"];
+
+                            if (textures[index] == null)
+                                textures[index] = LoadTexture(directory, gltfData, index);
+
+                            material.RMTexture = (NonColorTexture)textures[index];
+                        }
+
+                        if (gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"] != null)
+                        {
+                            material.BaseColor = new(
+                                (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][0],
+                                (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][1],
+                                (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][2]
+                            );
+                            material.Alpha = (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][3];
+                        }
+
+                        if (gltfMaterial["pbrMetallicRoughness"]["metallicFactor"] != null)
+                            material.MetallicFactor = (float)gltfMaterial["pbrMetallicRoughness"]["metallicFactor"];
+
+                        if (gltfMaterial["pbrMetallicRoughness"]["rougnessfactor"] != null)
+                            material.MetallicFactor = (float)gltfMaterial["pbrMetallicRoughness"]["roughnessFactor"];
+                    }
+
+                    if (gltfMaterial["emissiveFactor"] != null)
+                        material.EmissiveFactor = new(
+                            (float)gltfMaterial["emissiveFactor"][0], 
+                            (float)gltfMaterial["emissiveFactor"][1], 
+                            (float)gltfMaterial["emissiveFactor"][2]
+                        );
+
+                    if (gltfMaterial["alphaMode"] != null)
+                    {
+                        if ((string)gltfMaterial["alphaMode"] == "MASK")
+                            material.AlphaMode = AlphaMode.MASK;
+
+                        if ((string)gltfMaterial["alphaMode"] == "BLEND")
+                            material.AlphaMode = AlphaMode.BLEND;
+                    }
+
+                    if (gltfMaterial["alphaCutoff"] != null)
+                        material.AlphaCutoff = (float)gltfMaterial["alphaCutoff"];
+
+                    if (gltfMaterial["doubleSided"] != null)
+                        material.DoubleSided = (bool)gltfMaterial["doubleSided"];
+
+                    materials.Add(material);
+                }
 
             if (gltfData["meshes"] != null)
                 foreach (JToken gltfMesh in gltfData["meshes"])
@@ -46,11 +180,16 @@ namespace CGA2.Utils
                         JToken gltfAccessor;
                         Span<byte> buffer;
 
+                        int trianglesCount = 0;
+
                         gltfAccessor = gltfData["accessors"][(int)gltfPrimitive["indices"]];
                         gltfBufferView = gltfData["bufferViews"][(int)gltfAccessor["bufferView"]];
                         buffer = buffers[(int)gltfBufferView["buffer"]].AsSpan();
                         for (int i = 0; i < (int)gltfAccessor["count"]; i++)
+                        {
                             mesh.Triangles.Add(SpanReader.ReadUShort(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 2));
+                            trianglesCount++;
+                        }
 
                         gltfAccessor = gltfData["accessors"][(int)gltfPrimitive["attributes"]["POSITION"]];
                         gltfBufferView = gltfData["bufferViews"][(int)gltfAccessor["bufferView"]];
@@ -69,6 +208,13 @@ namespace CGA2.Utils
                         buffer = buffers[(int)gltfBufferView["buffer"]].AsSpan();
                         for (int i = 0; i < (int)gltfAccessor["count"]; i++)
                             mesh.UVs.Add(SpanReader.ReadVector2(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 8));
+
+                        Material material = gltfPrimitive["material"] != null ? materials[(int)gltfPrimitive["material"]] : new();
+
+                        Material[] primitiveMaterials = new Material[trianglesCount / 3];
+                        Array.Fill(primitiveMaterials, material);
+
+                        mesh.Materials.AddRange(primitiveMaterials);
                     }
 
                     meshes.Add(mesh);

@@ -174,14 +174,15 @@ namespace CGA2.Renderers
         private static Vector3 GetPixelColor(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld, ViewBufferData objectInfo, int x, int y)
         {
             int index = objectInfo.Index * 3;
+            MeshObject meshObject = objectInfo.MeshObject!;
 
-            int index1 = objectInfo.MeshObject!.Mesh.Triangles[index];
-            int index2 = objectInfo.MeshObject!.Mesh.Triangles[index + 1];
-            int index3 = objectInfo.MeshObject!.Mesh.Triangles[index + 2];
+            int index1 = meshObject.Mesh.Triangles[index];
+            int index2 = meshObject.Mesh.Triangles[index + 1];
+            int index3 = meshObject.Mesh.Triangles[index + 2];
 
-            Vector3 aw = objectInfo.MeshObject!.WorldPositions[index1];
-            Vector3 bw = objectInfo.MeshObject!.WorldPositions[index2];
-            Vector3 cw = objectInfo.MeshObject!.WorldPositions[index3];
+            Vector3 aw = meshObject.WorldPositions[index1];
+            Vector3 bw = meshObject.WorldPositions[index2];
+            Vector3 cw = meshObject.WorldPositions[index3];
 
             Vector3 D1 = screenToWorld.Dir0 + x * screenToWorld.DdDx + y * screenToWorld.DdDy;
             Vector3 D2 = D1 + screenToWorld.DdDx;
@@ -212,11 +213,19 @@ namespace CGA2.Renderers
             float w1 = 1f - u1 - v1;
             float w2 = 1f - u2 - v2;
 
-            Vector3 n1 = objectInfo.MeshObject!.WorldNormals[index1];
-            Vector3 n2 = objectInfo.MeshObject!.WorldNormals[index2];
-            Vector3 n3 = objectInfo.MeshObject!.WorldNormals[index3];
+            Vector3 n1 = meshObject.WorldNormals[index1];
+            Vector3 n2 = meshObject.WorldNormals[index2];
+            Vector3 n3 = meshObject.WorldNormals[index3];
+
+            Vector2 uv1 = meshObject.Mesh.UVs[index1];
+            Vector2 uv2 = meshObject.Mesh.UVs[index2];
+            Vector2 uv3 = meshObject.Mesh.UVs[index3];
 
             Vector3 n = u * n1 + v * n2 + w * n3;
+
+            Vector2 uv = u * uv1 + v * uv2 + w * uv3;
+            Vector2 uv_x = u1 * uv1 + v1 * uv2 + w1 * uv3;
+            Vector2 uv_y = u2 * uv1 + v2 * uv2 + w2 * uv3;
 
             Vector3 pw = u * aw + v * bw + w * cw;
 
@@ -225,7 +234,7 @@ namespace CGA2.Renderers
             foreach (LightObject lightObject in lightsObjects)
                 color += Max(Dot(n, lightObject.GetL(pw)), 0) * lightObject.GetIrradiance(pw);
 
-            return color;
+            return color * meshObject.Mesh.Materials[objectInfo.Index].BaseColorTexture.GetSample(uv, uv_x, uv_y).AsVector3();
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld)
