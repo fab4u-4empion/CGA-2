@@ -234,7 +234,7 @@ namespace CGA2.Renderers
             foreach (LightObject lightObject in lightsObjects)
                 color += Max(Dot(n, lightObject.GetL(pw)), 0) * lightObject.GetIrradiance(pw);
 
-            return color * meshObject.Mesh.Materials[objectInfo.Index].BaseColorTexture.GetSample(uv, uv_x, uv_y).AsVector3();
+            return color * meshObject.Mesh.Materials[objectInfo.Index].GetBaseColor(uv, uv_x, uv_y).BaseColor;
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, ScreenToWorldParams screenToWorld)
