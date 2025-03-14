@@ -183,5 +183,36 @@ namespace CGA2.UI.ObjectSettings
                 }
             }
         }
+
+        private void AddLight(Light light)
+        {
+            LightObject newLightObject = new()
+            {
+                Light = light,
+                Name = "New light"
+            };
+
+            Scene.Lights.Add(light);
+            Scene.Nodes.Add(newLightObject);
+            Scene.LightObjects.Add(newLightObject);
+            Scene.RootObjects.Add(newLightObject);
+
+            UpdateTreeView();
+        }
+
+        private void MenuItem_Click_Point(object sender, RoutedEventArgs e)
+        {
+            AddLight(new SphericalLight());
+        }
+
+        private void MenuItem_Click_Spot(object sender, RoutedEventArgs e)
+        {
+            AddLight(new SpotLight());
+        }
+
+        private void MenuItem_Click_Distant(object sender, RoutedEventArgs e)
+        {
+            AddLight(new DistantLight());
+        }
     }
 }

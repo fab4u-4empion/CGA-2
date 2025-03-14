@@ -10,7 +10,7 @@
         Style="{StaticResource MaterialDesignWindow}"
         Background="{DynamicResource MaterialDesign.Brush.Background}"
         FontFamily="{materialDesign:MaterialDesignFont}"
-        Height="600" 
+        Height="630" 
         Width="800"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -23,7 +23,16 @@
             <ColumnDefinition Width="400"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Margin="20,10,10,10">
+        <Menu Height="25" VerticalAlignment="Top" Grid.ColumnSpan="2" Background="#404040">
+            <MenuItem Header="Add object" Height="25" Background="#404040" Cursor="Hand">
+                <MenuItem Header="Light source" Height="25" Background="#404040" Cursor="Hand">
+                    <MenuItem Header="Point" Cursor="Hand" Click="MenuItem_Click_Point"/>
+                    <MenuItem Header="Spot" Cursor="Hand" Click="MenuItem_Click_Spot"/>
+                    <MenuItem Header="Distant" Cursor="Hand" Click="MenuItem_Click_Distant"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Column="0" Margin="20,35,10,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition/>
@@ -31,7 +40,7 @@
             <TextBlock Grid.Row="0" Text="Objects" HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"/>
             <TreeView Grid.Row="1" x:Name="ObjectsTreeView" SelectedItemChanged="ObjectsTreeView_SelectedItemChanged" Background="#404040"/>
         </Grid>
-        <Grid Grid.Column="1" Margin="10,10,20,10">
+        <Grid Grid.Column="1" Margin="10,35,20,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition/>

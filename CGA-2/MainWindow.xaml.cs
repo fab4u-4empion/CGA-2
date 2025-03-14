@@ -84,7 +84,7 @@ namespace CGA2
             CameraObject cameraObject = new()
             {
                 Camera = camera,
-                Location = new(0, 5f, 20f),
+                Location = new(0, 6f, 20f),
                 TargetRadius = 20f
             };
 
