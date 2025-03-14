@@ -10,7 +10,7 @@
             1.0
           ],
           "type": "point",
-          "intensity": 500,
+          "intensity": 1200
         },
         {
           "name": "PaleGreen",
@@ -20,7 +20,7 @@
             0.5
           ],
           "type": "point",
-          "intensity": 500
+          "intensity": 1200
         },
         {
           "name": "Lavender",
@@ -30,7 +30,7 @@
             1.0
           ],
           "type": "point",
-          "intensity": 500
+          "intensity": 1200
         },
         {
           "name": "Aquamarine",
@@ -40,7 +40,7 @@
             1.0
           ],
           "type": "point",
-          "intensity": 500
+          "intensity": 1200
         }
 
       ]

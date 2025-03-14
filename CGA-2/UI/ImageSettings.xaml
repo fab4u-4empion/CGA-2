@@ -12,14 +12,15 @@
         FontFamily="{materialDesign:MaterialDesignFont}"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="Image Settings" Height="230" Width="300"
+        Title="Image Settings" Height="290" Width="300"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="20,20,20,20">
+        <StackPanel Grid.Row="0" Margin="20,20,20,15">
             <Label Content="Tonemapper" FontSize="15" FontWeight="SemiBold"/>
             <ComboBox x:Name="TonemapperComboBox" Margin="0,5,0,0" FontWeight="Light" Foreground="White" SelectionChanged="TonemapperComboBox_SelectionChanged">
                 <ComboBoxItem x:Name="ACESComboItem" Content="ACES"/>
@@ -29,7 +30,7 @@
                 <ComboBoxItem x:Name="PBRNeutralComboItem" Content="PBRNeutral"/>
             </ComboBox>
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="20,0,20,20">
+        <StackPanel Grid.Row="1" Margin="20,0,20,15">
             <Label Content="Resolution" FontSize="15" FontWeight="SemiBold"/>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -60,6 +61,13 @@
                     <RadioButton x:Name="Radio4" GroupName="Resolution" HorizontalAlignment="Center" Checked="RadioButton_4_Checked"/>
                 </StackPanel>
             </Grid>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Margin="20,0,20,15">
+            <Label Content="Shader" FontSize="15" FontWeight="SemiBold"/>
+            <ComboBox x:Name="ShaderComboBox" Margin="0,5,0,0" FontWeight="Light" Foreground="White" SelectionChanged="ShaderComboBox_SelectionChanged">
+                <ComboBoxItem x:Name="PBRComboItem" Content="PBR"/>
+                <ComboBoxItem x:Name="PhongComboItem" Content="Phong"/>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </Window>

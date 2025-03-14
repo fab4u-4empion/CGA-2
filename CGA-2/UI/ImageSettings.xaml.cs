@@ -1,4 +1,5 @@
-﻿using CGA2.ToneMapping;
+﻿using CGA2.Shaders;
+using CGA2.ToneMapping;
 using System.Windows;
 using System.Windows.Controls;
 using static CGA2.Settings;
@@ -34,6 +35,15 @@ namespace CGA2.UI
 
             if (Settings.ToneMapper is PBRNeutralToneMapper)
                 PBRNeutralComboItem.IsSelected = true;
+
+            PBRComboItem.Tag = new PBRShader();
+            PhongComboItem.Tag = new PhongShader();
+
+            if (Settings.Shader is PBRShader)
+                PBRComboItem.IsSelected = true;
+
+            if (Settings.Shader is PhongShader)
+                PhongComboItem.IsSelected = true;
 
             switch (Scaling)
             {
@@ -87,6 +97,11 @@ namespace CGA2.UI
         private void TonemapperComboBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             Settings.ToneMapper = ((TonemapperComboBox.SelectedItem! as ComboBoxItem)!.Tag as ToneMapper)!;
+        }
+
+        private void ShaderComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Settings.Shader = ((ShaderComboBox.SelectedItem! as ComboBoxItem)!.Tag as Shader)!;
         }
     }
 }

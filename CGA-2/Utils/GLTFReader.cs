@@ -145,7 +145,7 @@ namespace CGA2.Utils
                     }
 
                     if (gltfMaterial["emissiveFactor"] != null)
-                        material.EmissiveFactor = new(
+                        material.Emission = new(
                             (float)gltfMaterial["emissiveFactor"][0], 
                             (float)gltfMaterial["emissiveFactor"][1], 
                             (float)gltfMaterial["emissiveFactor"][2]

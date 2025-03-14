@@ -23,10 +23,8 @@ namespace CGA2.Components.Materials
         public float AlphaCutoff { get; set; } = 0.5f;
         public AlphaMode AlphaMode { get; set; } = AlphaMode.OPAQUE;
 
-        public float OcclusionFactor { get; set; } = 1f;
         public float MetallicFactor { get; set; } = 1f;
         public float RoghnessFactor { get; set; } = 1f;
-        public Vector3 EmissiveFactor { get; set; } = Zero;
 
         public Vector3 Emission { get; set; } = Zero;
 
@@ -53,14 +51,14 @@ namespace CGA2.Components.Materials
 
         public Vector3 GetEmission(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
-            return EmissiveTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? EmissiveFactor;
+            return EmissiveTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? Emission;
         }
 
         public PBRParams GetPBRParams(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
             return new(RMTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? new Vector3(1f, RoghnessFactor, MetallicFactor))
             {
-                Occlusion = OcclusionTexture?.GetSample(uv, uv1, uv2).X ?? 1
+                Occlusion = OcclusionTexture?.GetSample(uv, uv1, uv2).X ?? 1f
             };
         }
     }

@@ -1,4 +1,5 @@
-﻿using CGA2.ToneMapping;
+﻿using CGA2.Shaders;
+using CGA2.ToneMapping;
 
 namespace CGA2
 {
@@ -13,5 +14,9 @@ namespace CGA2
         public static int MaxAnisotropy { get; set; } = 1;
 
         public static ToneMapper ToneMapper { get; set; } = new AcesFilmicToneMapper();
+
+        public static Shader Shader { get; set; } = new PBRShader();
+
+        public static float EmissionIntensity { get; set; } = 1f;
     }
 }
