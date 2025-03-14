@@ -6,6 +6,8 @@ namespace CGA2.Shaders
 {
     public abstract class Shader
     {
+        public abstract string Name { get; set; }
+
         public abstract Color GetColor(
             List<LightObject> lights,
             Components.Environment environment,

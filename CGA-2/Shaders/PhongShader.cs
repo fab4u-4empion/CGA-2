@@ -9,6 +9,8 @@ namespace CGA2.Shaders
 {
     public class PhongShader : Shader
     {
+        public override string Name { get; set; } = "Phong";
+
         public override Color GetColor(
             List<LightObject> lights, 
             Components.Environment environment, 

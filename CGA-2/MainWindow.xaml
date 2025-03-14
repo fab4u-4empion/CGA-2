@@ -49,6 +49,10 @@
                             <Run Text="Tonemapping: " Foreground="Gray"/>
                             <Run x:Name="TonemappingInfo" Text="text"/>
                         </TextBlock>
+                        <TextBlock Margin="0,3,0,0" HorizontalAlignment="Right" Foreground="{DynamicResource MaterialDesign.Brush.Foreground}">
+                            <Run Text="Shader: " Foreground="Gray"/>
+                            <Run x:Name="ShaderInfo" Text="text"/>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
             </StackPanel>

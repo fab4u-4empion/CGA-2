@@ -9,6 +9,8 @@ namespace CGA2.Shaders
 {
     public class PBRShader : Shader
     {
+        public override string Name { get; set; } = "PBR";
+
         private static Vector3 FresnelSchlick(float VdotH, Vector3 F0)
         {
             float t = 1 - VdotH;

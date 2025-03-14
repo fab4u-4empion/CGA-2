@@ -53,6 +53,8 @@ namespace CGA2
             }
 
             TonemappingInfo.Text = ToneMapper.Name;
+
+            ShaderInfo.Text = Shader.Name;
         }
 
         private void Draw()
