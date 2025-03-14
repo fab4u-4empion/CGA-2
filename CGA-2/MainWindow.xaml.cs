@@ -12,7 +12,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using static CGA2.Components.Objects.CameraObject;
 using static CGA2.Settings;
+using static System.Single;
 
 namespace CGA2
 {
@@ -44,6 +46,12 @@ namespace CGA2
             ResolutionTextBlock.Text = $"{Renderer.Result.PixelWidth} × {Renderer.Result.PixelHeight}";
             RenderTimeTextBlock.Text = $"{Timer.ElapsedMilliseconds} ms";
 
+            if (IsLoaded)
+            {
+                CameraModeInfo.Text = $"{Scene.CameraObjects[SelectedCamera].Mode}";
+                CameraFoVInfo.Text = $"{Round(RadiansToDegrees((Scene.CameraObjects[SelectedCamera].Camera as PerspectiveCamera)!.FieldOfView), MidpointRounding.AwayFromZero)}°";
+            }
+
             TonemappingInfo.Text = ToneMapper.Name;
         }
 
@@ -73,10 +81,11 @@ namespace CGA2
 
             PerspectiveCamera camera = new();
 
-            CameraObject cameraObject = new() 
-            { 
+            CameraObject cameraObject = new()
+            {
                 Camera = camera,
                 Location = new(0, 5f, 20f),
+                TargetRadius = 20f
             };
 
             Scene.CameraObjects.Add(cameraObject);
@@ -107,10 +116,32 @@ namespace CGA2
             MousePosition = e.GetPosition(this);
         }
 
+        private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            PerspectiveCamera camera = (PerspectiveCamera)Scene.CameraObjects[SelectedCamera].Camera;
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                
+                camera.FieldOfView -= Pi / 60 * Sign(e.Delta);
+                camera.FieldOfView = Clamp(camera.FieldOfView, Pi / 6, Pi / 2);
+            }
+            else
+            {
+                Scene.CameraObjects[SelectedCamera].UpdateTragetRadius(-0.3f * Sign(e.Delta));
+            }
+            Draw();
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key) 
             {
+                case Key.Space:
+                    if (!e.IsRepeat)
+                        Scene.CameraObjects[SelectedCamera].Mode = (CameraMode)(((int)Scene.CameraObjects[SelectedCamera].Mode + 1) % Enum.GetNames<CameraMode>().Length);
+                    Draw();
+                    break;
+
                 case Key.W:
                     Scene.CameraObjects[SelectedCamera].Move(-0.2f, 0f, 0f);
                     Draw();
@@ -201,5 +232,6 @@ namespace CGA2
                     break;
             }
         }
+        
     }
 }
