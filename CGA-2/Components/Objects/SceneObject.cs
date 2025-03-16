@@ -27,7 +27,7 @@ namespace CGA2.Components.Objects
                 Quaternion q = Normalize(value);
 
                 Yaw = Atan2(2 * (q.Y * q.W + q.X * q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
-                Pitch = Asin(2 * (q.X * q.W - q.Z * q.Y));
+                Pitch = Asin(Clamp(2 * (q.X * q.W - q.Z * q.Y), -1, 1));
                 Roll = Atan2(2 * (q.Y * q.X + q.W * q.Z), 1f - 2f * (q.X * q.X + q.Z * q.Z));
             } 
         }

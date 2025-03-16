@@ -1,6 +1,5 @@
 ﻿using CGA2.Components.Cameras;
 using System.Numerics;
-using System.Windows;
 using static System.Numerics.Matrix4x4;
 using static System.Numerics.Vector3;
 using static System.Single;
@@ -30,8 +29,8 @@ namespace CGA2.Components.Objects
             {
                 Vector3 target = Normalize(Transform(-UnitZ, WorldRotation)) * TargetRadius;
 
-                Yaw += dYaw * 3f;
-                Pitch = Clamp(Pitch + dPitch * 3f, -float.Pi / 2f, float.Pi / 2f);
+                Yaw += dYaw * 2f;
+                Pitch = Clamp(Pitch + dPitch * 2f, -float.Pi / 2f, float.Pi / 2f);
                 Roll = Clamp(Roll + dRoll, -float.Pi / 2f, float.Pi / 2f);
 
                 Location -= (Normalize(Transform(-UnitZ, WorldRotation)) * TargetRadius - target);
