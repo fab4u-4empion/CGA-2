@@ -9,6 +9,7 @@ namespace CGA2.Components.Objects
 
         public Vector3[] WorldPositions { get; set; } = [];
         public Vector3[] WorldNormals { get; set; } = [];
+        public Vector3[] WorldTangents { get; set; } = [];
         public Vector4[] ClipPositions { get; set; } = [];
     }
 }

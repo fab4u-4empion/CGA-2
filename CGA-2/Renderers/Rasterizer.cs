@@ -54,6 +54,7 @@ namespace CGA2.Renderers
 
             meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
             meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
+            meshObject.WorldTangents = new Vector3[meshObject.Mesh.Tangents.Count];
             meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
 
             Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Positions.Count), (range) =>
@@ -71,6 +72,7 @@ namespace CGA2.Renderers
                 {
                     Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
                     meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], Transpose(invWorldMatrix)));
+                    meshObject.WorldTangents[i] = Normalize(Transform(meshObject.Mesh.Tangents[i], Transpose(invWorldMatrix)));
                 }
             });
         }
@@ -223,6 +225,10 @@ namespace CGA2.Renderers
             Vector2 uv2 = meshObject.Mesh.UVs[index2];
             Vector2 uv3 = meshObject.Mesh.UVs[index3];
 
+            Vector3 t1 = meshObject.WorldTangents[index1];
+            Vector3 t2 = meshObject.WorldTangents[index2];
+            Vector3 t3 = meshObject.WorldTangents[index3];
+
             Vector3 n = u * n1 + v * n2 + w * n3;
 
             Vector2 uv = u * uv1 + v * uv2 + w * uv3;
@@ -234,8 +240,13 @@ namespace CGA2.Renderers
             Color baseColor = meshObject.Mesh.Materials[objectInfo.Index].GetBaseColor(uv, uv_x, uv_y);
             PBRParams pbrParams = meshObject.Mesh.Materials[objectInfo.Index].GetPBRParams(uv, uv_x, uv_y);
             Vector3 emission = meshObject.Mesh.Materials[objectInfo.Index].GetEmission(uv, uv_x, uv_y);
+            Vector3 normal = meshObject.Mesh.Materials[objectInfo.Index].GetNormal(uv, uv_x, uv_y);
 
-            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, n, cameraObject.WorldLocation, pw);
+            Vector3 t = (u * t1 + v * t2 + w * t3);
+            Vector3 b = Cross(n, t) * meshObject.Mesh.Signs[objectInfo.Index];
+            normal = t * normal.X + b * normal.Y + n * normal.Z;
+
+            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw);
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, Components.Environment environment, ScreenToWorldParams screenToWorld)

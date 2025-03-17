@@ -217,7 +217,7 @@ namespace CGA2.Utils
                         mesh.Materials.AddRange(primitiveMaterials);
                     }
 
-                    meshes.Add(mesh);
+                    meshes.Add(Mesh.CalculateTangents(mesh));
                 }
 
 

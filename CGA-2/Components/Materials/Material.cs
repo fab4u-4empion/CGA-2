@@ -61,5 +61,10 @@ namespace CGA2.Components.Materials
                 Occlusion = OcclusionTexture?.GetSample(uv, uv1, uv2).X ?? 1f
             };
         }
+
+        public Vector3 GetNormal(Vector2 uv, Vector2 uv1, Vector2 uv2)
+        {
+            return NormalTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? UnitZ;
+        }
     }
 }
