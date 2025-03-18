@@ -187,7 +187,19 @@ namespace CGA2.Utils
                         buffer = buffers[(int)gltfBufferView["buffer"]].AsSpan();
                         for (int i = 0; i < (int)gltfAccessor["count"]; i++)
                         {
-                            mesh.Triangles.Add(SpanReader.ReadUShort(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 2));
+                            short componentType = (short)gltfAccessor["componentType"];
+                            int index = 0;
+
+                            if (componentType == 5120 || componentType == 5121)
+                                index = SpanReader.ReadByte(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i);
+
+                            if (componentType == 5122 || componentType == 5123)
+                                index = SpanReader.ReadShort(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 2);
+
+                            if (componentType == 5125)
+                                index = SpanReader.ReadInt(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 4);
+
+                            mesh.Triangles.Add(index);
                             trianglesCount++;
                         }
 

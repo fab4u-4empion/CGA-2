@@ -12,7 +12,7 @@ namespace CGA2.Components
         public List<Vector3> Positions { get; set; } = [];
         public List<Vector3> Normals { get; set; } = [];
         public List<Vector2> UVs { get; set; } = [];
-        public List<ushort> Triangles { get; set; } = [];
+        public List<int> Triangles { get; set; } = [];
         public List<Vector3> Tangents { get; set; } = [];
         public List<sbyte> Signs { get; set; } = [];
         public List<Material> Materials { get; set; } = [];
@@ -21,7 +21,7 @@ namespace CGA2.Components
         {
             Mesh newMesh = new() { Materials = mesh.Materials};
 
-            Dictionary<(ushort, sbyte), int> indicesDictionary = [];
+            Dictionary<(int, sbyte), int> indicesDictionary = [];
 
             for (int i = 0; i < mesh.Triangles.Count; i += 3)
             {
@@ -47,7 +47,7 @@ namespace CGA2.Components
 
                 for (int j = i; j < i + 3; j++)
                 {
-                    (ushort, sbyte) key = (mesh.Triangles[j], sign);
+                    (int, sbyte) key = (mesh.Triangles[j], sign);
 
                     if (!indicesDictionary.TryGetValue(key, out int index))
                     {

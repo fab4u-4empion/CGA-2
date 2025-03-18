@@ -29,9 +29,19 @@ namespace CGA2.Utils
             return ToSingle(buffer.Slice(offset, 4));
         }
 
-        public static ushort ReadUShort(Span<byte> buffer, int offset)
+        public static ushort ReadByte(Span<byte> buffer, int offset)
+        {
+            return ToUInt16(buffer.Slice(offset, 1));
+        }
+
+        public static ushort ReadShort(Span<byte> buffer, int offset)
         {
             return ToUInt16(buffer.Slice(offset, 2));
+        }
+
+        public static ushort ReadInt(Span<byte> buffer, int offset)
+        {
+            return ToUInt16(buffer.Slice(offset, 4));
         }
     }
 }
