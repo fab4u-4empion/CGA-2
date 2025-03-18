@@ -256,26 +256,35 @@ namespace CGA2.Renderers
                 for (int x = 0; x < HDRBuffer.Width; x++)
                 {
                     if (ViewBuffer[x, y].MeshObject != null)
-                    HDRBuffer[x, y] = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, ViewBuffer[x, y], x, y);
+                        HDRBuffer[x, y] = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, ViewBuffer[x, y], x, y);
                 }
             });
         }
 
-        private void DrawHDRBuffer()
+        private void DrawHDRBuffer(Components.Environment environment, CameraObject cameraObject)
         {
+            ScreenToWorldParams screenToWorld = GetViewportToWorldParams(cameraObject, float.Pi / 4f);
+
             Parallel.For(0, HDRBuffer.Height, (y) =>
             {
-            for (int x = 0; x < HDRBuffer.Width; x++)
+                for (int x = 0; x < HDRBuffer.Width; x++)
                 {
-                    Result.SetPixel(x, y, ToneMapper.CompressColor(HDRBuffer[x, y].BaseColor));
+                    Vector3 backColor = environment.Color;
+                    if (UseSkybox && environment.IBLSpecularMap.Count > 0)
+                    {
+                        Vector3 p = screenToWorld.Dir0 + x * screenToWorld.DdDx + y * screenToWorld.DdDy;
+                        backColor = environment.IBLSpecularMap[0].GetColor(Normalize(p));
+                    }
+
+                    Result.SetPixel(x, y, ToneMapper.CompressColor(HDRBuffer[x, y].BaseColor + (1f - HDRBuffer[x, y].Alpha) * backColor));
                 }
             });
         }
 
-        private ScreenToWorldParams GetViewportToWorldParams(CameraObject cameraObject)
+        private ScreenToWorldParams GetViewportToWorldParams(CameraObject cameraObject, float? tanParam = null)
         {
             float aspect = cameraObject.Camera.AspectRatio;
-            float tan = Tan((cameraObject.Camera as PerspectiveCamera)!.FieldOfView / 2f);
+            float tan = Tan(tanParam ?? ((cameraObject.Camera as PerspectiveCamera)!.FieldOfView / 2f));
 
             Matrix4x4 cameraRotation = CreateFromQuaternion(cameraObject.WorldRotation);
 
@@ -283,9 +292,9 @@ namespace CGA2.Renderers
             Vector3 Y = Create(cameraRotation.M21, cameraRotation.M22, cameraRotation.M23) * tan;
             Vector3 Z = Create(cameraRotation.M31, cameraRotation.M32, cameraRotation.M33);
 
-            Vector3 p0 = (1f / Result.PixelWidth - 1) * X + (-1f / Result.PixelHeight + 1) * Y - Z;
-            Vector3 dpdx = X * 2 / Result.PixelWidth;
-            Vector3 dpdy = Y * -2 / Result.PixelHeight;
+            Vector3 p0 = (1f / Result.PixelWidth - 1f) * X + (-1f / Result.PixelHeight + 1f) * Y - Z;
+            Vector3 dpdx = X * 2f / Result.PixelWidth;
+            Vector3 dpdy = Y * -2f / Result.PixelHeight;
 
             return (p0, dpdx, dpdy);
         }
@@ -300,7 +309,7 @@ namespace CGA2.Renderers
 
             ScreenToWorldParams screenToWorld = GetViewportToWorldParams(cameraObject);
 
-            Array.Fill(HDRBuffer.Array, new(scene.Environment.Color));
+            Array.Fill(HDRBuffer.Array, new(Zero, 0f));
             Array.Fill(ZBuffer.Array, 1);
             Array.Fill(ViewBuffer.Array, (null, -1));
 
@@ -313,7 +322,7 @@ namespace CGA2.Renderers
             }
 
             DrawViewBuffer(cameraObject, scene.LightObjects, scene.Environment, screenToWorld);
-            DrawHDRBuffer();
+            DrawHDRBuffer(scene.Environment, cameraObject);
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));
             Result.Source.Unlock();
@@ -330,7 +339,7 @@ namespace CGA2.Renderers
 
             Array.Fill(Spins.Array, new(false));
 
-            ViewportMatrix = Matrix4x4.CreateViewportLeftHanded(-0.5f, -0.5f, Result.PixelWidth, Result.PixelHeight, 0, 1);
+            ViewportMatrix = CreateViewportLeftHanded(-0.5f, -0.5f, Result.PixelWidth, Result.PixelHeight, 0, 1);
         }
     }
 }

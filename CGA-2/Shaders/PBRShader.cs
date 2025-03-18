@@ -82,7 +82,23 @@ namespace CGA2.Shaders
                 color += ((One - reflectance) * diffuse + specular) * NdotL * irradiance;
             }
 
-            color += baseColor.BaseColor * environment.Color * pbrParams.Occlusion;
+            Vector3 ambientReflectance = F0;
+            Vector3 ambientDiffuse = albedo / float.Pi;
+            Vector3 ambientIrradiance = environment.GetIBLDiffuseColor(N);
+
+            float lod = pbrParams.Roughness * (environment.IBLSpecularMap.Count - 1);
+            int lod0 = (int)lod, lod1 = int.Min(lod0 + 1, environment.IBLSpecularMap.Count - 1);
+
+            Vector3 R = Reflect(-V, N);
+
+            Vector3 ambientSpecularLight0 = environment.GetIBLSpecularColor(R, lod0);
+            Vector3 ambientSpecularLight1 = environment.GetIBLSpecularColor(R, lod1);
+            Vector3 ambientSpecularLight = Lerp(ambientSpecularLight0, ambientSpecularLight1, lod - lod0);
+            Vector3 brdf = environment.BRDFLUT.GetColor(NdotV, 1 - pbrParams.Roughness);
+
+            Vector3 ambientSpecular = ambientSpecularLight * (ambientReflectance * brdf.X + new Vector3(brdf.Y));
+
+            color += ((One - ambientReflectance) * ambientDiffuse * ambientIrradiance + ambientSpecular) * pbrParams.Occlusion;
 
             color += emission * EmissionIntensity;
 

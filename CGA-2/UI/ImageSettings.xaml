@@ -12,7 +12,8 @@
         FontFamily="{materialDesign:MaterialDesignFont}"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="Image Settings" Height="290" Width="300"
+        Title="Image Settings"
+        SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
@@ -34,11 +35,11 @@
             <Label Content="Resolution" FontSize="15" FontWeight="SemiBold"/>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <Label Content="x0.25" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>

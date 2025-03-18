@@ -18,5 +18,7 @@ namespace CGA2
         public static Shader Shader { get; set; } = new PBRShader();
 
         public static float EmissionIntensity { get; set; } = 1f;
+
+        public static bool UseSkybox { get; set; } = true;
     }
 }

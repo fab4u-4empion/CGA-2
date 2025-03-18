@@ -1,6 +1,5 @@
 ﻿using CGA2.Components;
 using CGA2.Components.Cameras;
-using CGA2.Components.Lights;
 using CGA2.Components.Objects;
 using CGA2.Renderers;
 using CGA2.UI;
@@ -86,7 +85,7 @@ namespace CGA2
             CameraObject cameraObject = new()
             {
                 Camera = camera,
-                Location = new(0, 6f, 20f),
+                Location = new(0f, 5.5f, 20f),
                 TargetRadius = 20f
             };
 
@@ -194,6 +193,18 @@ namespace CGA2
                     ImageSettings imgSettings = new();
                     imgSettings.ShowDialog();
                     Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    Draw();
+                    break;
+
+                case Key.F4:
+                    EnvironmentSettings envSettings = new(Scene.Environment);
+                    envSettings.ShowDialog();
+                    Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    Draw();
+                    break;
+
+                case Key.F5:
+                    UseSkybox = !UseSkybox;
                     Draw();
                     break;
 
