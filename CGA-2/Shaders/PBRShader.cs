@@ -102,7 +102,7 @@ namespace CGA2.Shaders
 
             color += emission * EmissionIntensity;
 
-            return new(color, baseColor.Alpha);
+            return new(color * baseColor.Alpha, baseColor.Alpha);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace CGA2.Renderers
 {
     using ViewBufferData = (MeshObject? MeshObject, int Index);
     using ScreenToWorldParams = (Vector3 Dir0, Vector3 DdDx, Vector3 DdDy);
+    using Layer = (MeshObject? MeshObject, int Index, float Z);
 
     public class Rasterizer : Renderer
     {
@@ -28,6 +29,10 @@ namespace CGA2.Renderers
         private Buffer<float> ZBuffer = new(0, 0);
         private Buffer<ViewBufferData> ViewBuffer = new(0, 0);
         private Buffer<Color> HDRBuffer = new(0, 0);
+
+        private Buffer<int> OffsetBuffer = new(0, 0);
+        private Buffer<byte> CountBuffer = new(0, 0);
+        public Layer[] LayersBuffer = [];
 
         private static float PerpDotProduct(Vector2 a, Vector2 b) => a.X * b.Y - a.Y * b.X;
 
@@ -44,6 +49,26 @@ namespace CGA2.Renderers
             }
 
             Spins[x, y].Exit(false);
+        }
+
+        private void IncDepth(int x, int y, float z, ViewBufferData data)
+        {
+            if (z < ZBuffer[x, y])
+                Interlocked.Increment(ref OffsetBuffer[x, y]);
+        }
+
+        private void DrawPixelIntoLayers(int x, int y, float z, ViewBufferData data)
+        {
+            if (z < ZBuffer[x, y])
+            {
+                bool gotLock = false;
+                Spins[x, y].Enter(ref gotLock);
+
+                LayersBuffer[OffsetBuffer[x, y] + CountBuffer[x, y]] = (data.MeshObject, data.Index, z);
+                CountBuffer[x, y] += 1;
+
+                Spins[x, y].Exit(false);
+            }
         }
 
         private static void TransformAttributes(CameraObject cameraObject, MeshObject meshObject)
@@ -74,7 +99,7 @@ namespace CGA2.Renderers
             }
         }
 
-        private void Rasterize(List<MeshObject> meshObjects, List<Range> ranges, Action<int, int, float, ViewBufferData> callBack)
+        private void Rasterize(List<MeshObject> meshObjects, List<Range> ranges, bool drawTransparentTriangles, Action<int, int, float, ViewBufferData> callBack)
         {
             Parallel.ForEach(Partitioner.Create(0, ranges[^1].End.Value), (range) =>
             {
@@ -86,6 +111,9 @@ namespace CGA2.Renderers
 
                     int triangleIndex = i - ranges[m].Start.Value;
                     int index = triangleIndex * 3;
+
+                    if (drawTransparentTriangles != meshObject.Mesh.Materials[triangleIndex].IsTransparent)
+                        continue;
 
                     int index1 = meshObject.Mesh.Triangles[index];
                     int index2 = meshObject.Mesh.Triangles[index + 1];
@@ -248,6 +276,9 @@ namespace CGA2.Renderers
             Vector3 b = Cross(n, t) * meshObject.Mesh.Signs[objectInfo.Index];
             normal = t * normal.X + b * normal.Y + n * normal.Z;
 
+            if (det1 < 0)
+                normal = -normal;
+
             return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw);
         }
 
@@ -259,6 +290,84 @@ namespace CGA2.Renderers
                 {
                     if (ViewBuffer[x, y].MeshObject != null)
                         HDRBuffer[x, y] = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, ViewBuffer[x, y], x, y);
+                }
+            });
+        }
+
+        private Color GetResultColor(
+            CameraObject cameraObject, 
+            List<LightObject> lightsObjects, 
+            Components.Environment environment, 
+            ScreenToWorldParams screenToWorld, 
+            int start, 
+            int length, 
+            int x, 
+            int y
+        )
+        {
+            float key;
+            Layer layer;
+            int j;
+            for (int i = 1 + start; i < length + start; i++)
+            {
+                key = LayersBuffer[i].Z;
+                layer = LayersBuffer[i];
+                j = i - 1;
+
+                while (j >= start && LayersBuffer[j].Z > key)
+                {
+                    LayersBuffer[j + 1] = LayersBuffer[j];
+                    j--;
+                }
+                LayersBuffer[j + 1] = layer;
+            }
+
+            Vector3 color = Zero;
+            float alpha = 0f;
+
+            for (int i = start; i < length + start; i++)
+            {
+                Color pixel = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, (LayersBuffer[i].MeshObject, LayersBuffer[i].Index), x, y);
+
+                if (pixel.Alpha == 0) continue;
+
+                color += (1f - alpha) * pixel.BaseColor;
+                alpha += (1f - alpha) * pixel.Alpha;
+
+                if (pixel.Alpha == 1f)
+                    return new(color);
+            }
+
+            return new(color, alpha);
+        }
+
+        private void DrawLayers(CameraObject cameraObject, List<LightObject> lightsObjects, Components.Environment environment, ScreenToWorldParams screenToWorld)
+        {
+            Parallel.For(0, Result.PixelHeight, (y) =>
+            {
+                for (int x = 0; x < Result.PixelWidth; x++)
+                {
+                    Color color = new(Zero, 0f);
+
+                    if (CountBuffer[x, y] > 0)
+                    {
+                        color = GetResultColor(cameraObject, lightsObjects, environment, screenToWorld, OffsetBuffer[x, y], CountBuffer[x, y], x, y);
+                    }
+
+                    if (color.Alpha == 1f)
+                    {
+                        HDRBuffer[x, y] = color;
+                        continue;
+                    }
+
+                    if (ViewBuffer[x, y].MeshObject != null)
+                    {
+                        Color pixel = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, ViewBuffer[x, y], x, y);
+                        HDRBuffer[x, y] = new(pixel.BaseColor * (1f - color.Alpha) + color.BaseColor);
+                        continue;
+                    }
+
+                    HDRBuffer[x, y] = color;
                 }
             });
         }
@@ -314,6 +423,8 @@ namespace CGA2.Renderers
             Array.Fill(HDRBuffer.Array, new(Zero, 0f));
             Array.Fill(ZBuffer.Array, 1);
             Array.Fill(ViewBuffer.Array, (null, -1));
+            Array.Fill(OffsetBuffer.Array, 0);
+            Array.Fill(CountBuffer.Array, (byte)0);
 
             Result.Source.Lock();
 
@@ -333,10 +444,37 @@ namespace CGA2.Renderers
                     totalLength += meshObject.Mesh.Triangles.Count / 3;
                 }
 
-                Rasterize(scene.MeshObjects, ranges, DrawIntoViewBuffer);
-            }
+                Rasterize(scene.MeshObjects, ranges, false, DrawIntoViewBuffer);
 
-            DrawViewBuffer(cameraObject, scene.LightObjects, scene.Environment, screenToWorld);
+                Rasterize(scene.MeshObjects, ranges, true, IncDepth);
+
+                int prefixSum = 0;
+                int depth = 0;
+
+                for (int y = 0; y < Result.PixelHeight; y++)
+                {
+                    for (int x = 0; x < Result.PixelWidth; x++)
+                    {
+                        depth = OffsetBuffer[x, y];
+                        OffsetBuffer[x, y] = prefixSum;
+                        prefixSum += depth;
+                    }
+                }
+
+                if (prefixSum > 0)
+                {
+                    LayersBuffer = new Layer[prefixSum];
+
+                    Rasterize(scene.MeshObjects, ranges, true, DrawPixelIntoLayers);
+
+                    DrawLayers(cameraObject, scene.LightObjects, scene.Environment, screenToWorld);
+                }
+                else
+                {
+                    DrawViewBuffer(cameraObject, scene.LightObjects, scene.Environment, screenToWorld);
+                }
+            }
+            
             DrawHDRBuffer(scene.Environment, cameraObject);
 
             Result.Source.AddDirtyRect(new(0, 0, Result.PixelWidth, Result.PixelHeight));
@@ -351,6 +489,8 @@ namespace CGA2.Renderers
             ZBuffer = new(Result.PixelWidth, Result.PixelHeight);
             ViewBuffer = new(Result.PixelWidth, Result.PixelHeight);
             Spins = new(Result.PixelWidth, Result.PixelHeight);
+            OffsetBuffer = new(Result.PixelWidth, Result.PixelHeight);
+            CountBuffer = new(Result.PixelWidth, Result.PixelHeight);
 
             Array.Fill(Spins.Array, new(false));
 

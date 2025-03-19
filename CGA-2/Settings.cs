@@ -11,7 +11,7 @@ namespace CGA2
 
         public static float Exposure { get; set; } = 1f;
 
-        public static int MaxAnisotropy { get; set; } = 1;
+        public static int MaxAnisotropy { get; set; } = 16;
 
         public static ToneMapper ToneMapper { get; set; } = new AcesFilmicToneMapper();
 
