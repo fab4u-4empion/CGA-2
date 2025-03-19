@@ -180,16 +180,13 @@ namespace CGA2.Utils
                         JToken gltfAccessor;
                         Span<byte> buffer;
 
-                        int trianglesCount = 0;
-
                         gltfAccessor = gltfData["accessors"][(int)gltfPrimitive["indices"]];
                         gltfBufferView = gltfData["bufferViews"][(int)gltfAccessor["bufferView"]];
                         buffer = buffers[(int)gltfBufferView["buffer"]].AsSpan();
+                        short componentType = (short)gltfAccessor["componentType"];
+                        int index = 0;
                         for (int i = 0; i < (int)gltfAccessor["count"]; i++)
-                        {
-                            short componentType = (short)gltfAccessor["componentType"];
-                            int index = 0;
-
+                        {                          
                             if (componentType == 5120 || componentType == 5121)
                                 index = SpanReader.ReadByte(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i);
 
@@ -200,7 +197,6 @@ namespace CGA2.Utils
                                 index = SpanReader.ReadInt(buffer, (int)(gltfBufferView["byteOffset"] ?? 0) + i * 4);
 
                             mesh.Triangles.Add(index);
-                            trianglesCount++;
                         }
 
                         gltfAccessor = gltfData["accessors"][(int)gltfPrimitive["attributes"]["POSITION"]];
@@ -223,7 +219,7 @@ namespace CGA2.Utils
 
                         Material material = gltfPrimitive["material"] != null ? materials[(int)gltfPrimitive["material"]] : new();
 
-                        Material[] primitiveMaterials = new Material[trianglesCount / 3];
+                        Material[] primitiveMaterials = new Material[mesh.Triangles.Count / 3];
                         Array.Fill(primitiveMaterials, material);
 
                         mesh.Materials.AddRange(primitiveMaterials);

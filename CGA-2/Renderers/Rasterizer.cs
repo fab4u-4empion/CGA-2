@@ -12,6 +12,8 @@ using CGA2.Utils;
 using CGA2.Components.Cameras;
 using CGA2.Components.Materials;
 using static CGA2.Utils.ArrayTools;
+using System.Diagnostics;
+using System.Windows;
 
 namespace CGA2.Renderers
 {
@@ -81,21 +83,21 @@ namespace CGA2.Renderers
             Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
             invWorldMatrix = Transpose(invWorldMatrix);
 
-            meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
-            meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
-            meshObject.WorldTangents = new Vector3[meshObject.Mesh.Tangents.Count];
-            meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
+            meshObject.WorldPositions.Clear();
+            meshObject.WorldNormals.Clear();
+            meshObject.WorldTangents.Clear();
+            meshObject.ClipPositions.Clear();
 
-            for (int i = 0; i < meshObject.WorldPositions.Length; i++)
+            for (int i = 0; i < meshObject.Mesh.Positions.Count; i++)
             {
-                meshObject.WorldPositions[i] = Transform(meshObject.Mesh.Positions[i], worldMatrix);
-                meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], viewProjectionMatrix);
+                meshObject.WorldPositions.Add(Transform(meshObject.Mesh.Positions[i], worldMatrix));
+                meshObject.ClipPositions.Add(Vector4.Transform(meshObject.WorldPositions[i], viewProjectionMatrix));
             }
 
-            for (int i = 0; i < meshObject.WorldNormals.Length; i++)
+            for (int i = 0; i < meshObject.Mesh.Normals.Count; i++)
             {
-                meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], invWorldMatrix));
-                meshObject.WorldTangents[i] = Normalize(Transform(meshObject.Mesh.Tangents[i], invWorldMatrix));
+                meshObject.WorldNormals.Add(Normalize(Transform(meshObject.Mesh.Normals[i], invWorldMatrix)));
+                meshObject.WorldTangents.Add(Normalize(Transform(meshObject.Mesh.Tangents[i], invWorldMatrix)));
             }
         }
 

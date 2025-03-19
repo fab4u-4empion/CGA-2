@@ -60,7 +60,7 @@ namespace CGA2.Components
                         newMesh.Tangents.Add(new());
                     }
 
-                    newMesh.Triangles.Add((ushort)index);
+                    newMesh.Triangles.Add(index);
 
                     Vector3 n = newMesh.Normals[index];
                     newMesh.Tangents[index] += t - Dot(t, n) * n;
