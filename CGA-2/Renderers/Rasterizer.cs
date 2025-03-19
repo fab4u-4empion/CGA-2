@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 using CGA2.Utils;
 using CGA2.Components.Cameras;
 using CGA2.Components.Materials;
-using System;
+using static CGA2.Utils.ArrayTools;
 
 namespace CGA2.Renderers
 {
@@ -51,39 +51,40 @@ namespace CGA2.Renderers
             Matrix4x4 worldMatrix = meshObject.WorldMatrix;
             Matrix4x4 viewMatrix = cameraObject.ViewMatrix;
             Matrix4x4 projectionMatrix = cameraObject.Camera.ProjectionMatrix;
+            Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
+
+            Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
+            invWorldMatrix = Transpose(invWorldMatrix);
 
             meshObject.WorldPositions = new Vector3[meshObject.Mesh.Positions.Count];
             meshObject.WorldNormals = new Vector3[meshObject.Mesh.Normals.Count];
             meshObject.WorldTangents = new Vector3[meshObject.Mesh.Tangents.Count];
             meshObject.ClipPositions = new Vector4[meshObject.Mesh.Positions.Count];
 
-            Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Positions.Count), (range) =>
+            for (int i = 0; i < meshObject.WorldPositions.Length; i++)
             {
-                for (int i = range.Item1; i < range.Item2; i++)
-                {
-                    meshObject.WorldPositions[i] = Transform(meshObject.Mesh.Positions[i], worldMatrix);
-                    meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], viewMatrix * projectionMatrix);
-                }
-            });
+                meshObject.WorldPositions[i] = Transform(meshObject.Mesh.Positions[i], worldMatrix);
+                meshObject.ClipPositions[i] = Vector4.Transform(meshObject.WorldPositions[i], viewProjectionMatrix);
+            }
 
-            Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Normals.Count), (range) =>
+            for (int i = 0; i < meshObject.WorldNormals.Length; i++)
             {
-                for (int i = range.Item1; i < range.Item2; i++)
-                {
-                    Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
-                    meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], Transpose(invWorldMatrix)));
-                    meshObject.WorldTangents[i] = Normalize(Transform(meshObject.Mesh.Tangents[i], Transpose(invWorldMatrix)));
-                }
-            });
+                meshObject.WorldNormals[i] = Normalize(Transform(meshObject.Mesh.Normals[i], invWorldMatrix));
+                meshObject.WorldTangents[i] = Normalize(Transform(meshObject.Mesh.Tangents[i], invWorldMatrix));
+            }
         }
 
-        private void Rasterize(MeshObject meshObject, Action<int, int, float, ViewBufferData> callBack)
+        private void Rasterize(List<MeshObject> meshObjects, List<Range> ranges, Action<int, int, float, ViewBufferData> callBack)
         {
-            Parallel.ForEach(Partitioner.Create(0, meshObject.Mesh.Triangles.Count / 3), (range) =>
+            Parallel.ForEach(Partitioner.Create(0, ranges[^1].End.Value), (range) =>
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    int index = i * 3;
+                    int m = BinarySearch(ranges, i);
+
+                    MeshObject meshObject = meshObjects[m];
+
+                    int index = (i - ranges[m].Start.Value) * 3;
 
                     int index1 = meshObject.Mesh.Triangles[index];
                     int index2 = meshObject.Mesh.Triangles[index + 1];
@@ -164,7 +165,7 @@ namespace CGA2.Renderers
                                 for (int y = top; y < bottom; y++)
                                 {
                                     Vector4 p = p1 + (y - p1.Y) * k;
-                                    callBack(x, y, p.Z, (meshObject, i));
+                                    callBack(x, y, p.Z, (meshObject, i - ranges[m].Start.Value));
                                 }
                             }
                         }
@@ -315,10 +316,23 @@ namespace CGA2.Renderers
 
             Result.Source.Lock();
 
-            foreach (MeshObject meshObject in scene.MeshObjects)
+            if (scene.MeshObjects.Count > 0)
             {
-                TransformAttributes(cameraObject, meshObject);
-                Rasterize(meshObject, DrawIntoViewBuffer);
+                Parallel.For(0, scene.MeshObjects.Count, i =>
+                {
+                    TransformAttributes(cameraObject, scene.MeshObjects[i]);
+                });
+
+                List<Range> ranges = [];
+                int totalLength = 0;
+
+                foreach (MeshObject meshObject in scene.MeshObjects)
+                {
+                    ranges.Add(totalLength..(totalLength + meshObject.Mesh.Triangles.Count / 3 - 1));
+                    totalLength += meshObject.Mesh.Triangles.Count / 3;
+                }
+
+                Rasterize(scene.MeshObjects, ranges, DrawIntoViewBuffer);
             }
 
             DrawViewBuffer(cameraObject, scene.LightObjects, scene.Environment, screenToWorld);
