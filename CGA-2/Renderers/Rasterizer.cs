@@ -84,7 +84,8 @@ namespace CGA2.Renderers
 
                     MeshObject meshObject = meshObjects[m];
 
-                    int index = (i - ranges[m].Start.Value) * 3;
+                    int triangleIndex = i - ranges[m].Start.Value;
+                    int index = triangleIndex * 3;
 
                     int index1 = meshObject.Mesh.Triangles[index];
                     int index2 = meshObject.Mesh.Triangles[index + 1];
@@ -133,7 +134,7 @@ namespace CGA2.Renderers
                         Vector4 b = result[j];
                         Vector4 c = result[j + 1];
 
-                        if (PerpDotProduct(new(c.X - a.X, c.Y - a.Y), new(b.X - a.X, b.Y - a.Y)) > 0)
+                        if (meshObject.Mesh.Materials[triangleIndex].DoubleSided || PerpDotProduct(new(c.X - a.X, c.Y - a.Y), new(b.X - a.X, b.Y - a.Y)) > 0)
                         {
 
                             if (b.X < a.X)
@@ -165,7 +166,7 @@ namespace CGA2.Renderers
                                 for (int y = top; y < bottom; y++)
                                 {
                                     Vector4 p = p1 + (y - p1.Y) * k;
-                                    callBack(x, y, p.Z, (meshObject, i - ranges[m].Start.Value));
+                                    callBack(x, y, p.Z, (meshObject, triangleIndex));
                                 }
                             }
                         }

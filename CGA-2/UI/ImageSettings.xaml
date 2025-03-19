@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="20,20,20,15">
             <Label Content="Tonemapper" FontSize="15" FontWeight="SemiBold"/>
@@ -32,6 +33,45 @@
             </ComboBox>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="20,0,20,15">
+            <Label Content="Shader" FontSize="15" FontWeight="SemiBold"/>
+            <ComboBox x:Name="ShaderComboBox" Margin="0,5,0,0" FontWeight="Light" Foreground="White" SelectionChanged="ShaderComboBox_SelectionChanged">
+                <ComboBoxItem x:Name="PBRComboItem" Content="PBR"/>
+                <ComboBoxItem x:Name="PhongComboItem" Content="Phong"/>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Margin="20,0,20,15">
+            <Label Content="Anisotropic filtering" FontSize="15" FontWeight="SemiBold"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="45"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <Label Content="x1" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="RadioAniso1" GroupName="Aniso" HorizontalAlignment="Center" Checked="RadioButton_Aniso_1_Checked"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <Label Content="x2" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="RadioAniso2" GroupName="Aniso" HorizontalAlignment="Center" Checked="RadioButton_Aniso_2_Checked"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <Label Content="x4" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="RadioAniso4" GroupName="Aniso" HorizontalAlignment="Center" Checked="RadioButton_Aniso_4_Checked"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3">
+                    <Label Content="x8" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="RadioAniso8" GroupName="Aniso" HorizontalAlignment="Center" Checked="RadioButton_Aniso_8_Checked"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4" >
+                    <Label Content="x16" FontSize="14" FontWeight="Light" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="RadioAniso16" GroupName="Aniso" HorizontalAlignment="Center" Checked="RadioButton_Aniso_16_Checked"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="20,0,20,15">
             <Label Content="Resolution" FontSize="15" FontWeight="SemiBold"/>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -62,13 +102,6 @@
                     <RadioButton x:Name="Radio4" GroupName="Resolution" HorizontalAlignment="Center" Checked="RadioButton_4_Checked"/>
                 </StackPanel>
             </Grid>
-        </StackPanel>
-        <StackPanel Grid.Row="2" Margin="20,0,20,15">
-            <Label Content="Shader" FontSize="15" FontWeight="SemiBold"/>
-            <ComboBox x:Name="ShaderComboBox" Margin="0,5,0,0" FontWeight="Light" Foreground="White" SelectionChanged="ShaderComboBox_SelectionChanged">
-                <ComboBoxItem x:Name="PBRComboItem" Content="PBR"/>
-                <ComboBoxItem x:Name="PhongComboItem" Content="Phong"/>
-            </ComboBox>
         </StackPanel>
     </Grid>
 </Window>

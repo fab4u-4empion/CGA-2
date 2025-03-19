@@ -67,6 +67,29 @@ namespace CGA2.UI
                     Radio4.IsChecked = true;
                     break;
             }
+
+            switch (MaxAnisotropy)
+            {
+                case 1:
+                    RadioAniso1.IsChecked = true;
+                    break;
+
+                case 2:
+                    RadioAniso2.IsChecked = true;
+                    break;
+
+                case 4:
+                    RadioAniso4.IsChecked = true;
+                    break;
+
+                case 8:
+                    RadioAniso8.IsChecked = true;
+                    break;
+
+                case 16:
+                    RadioAniso16.IsChecked = true;
+                    break;
+            }
         }
 
         private void RadioButton_025_Checked(object sender, RoutedEventArgs e)
@@ -92,6 +115,31 @@ namespace CGA2.UI
         private void RadioButton_4_Checked(object sender, RoutedEventArgs e)
         {
             Scaling = 4f;
+        }
+
+        private void RadioButton_Aniso_1_Checked(object sender, RoutedEventArgs e)
+        {
+            MaxAnisotropy = 1;
+        }
+
+        private void RadioButton_Aniso_2_Checked(object sender, RoutedEventArgs e)
+        {
+            MaxAnisotropy = 2;
+        }
+
+        private void RadioButton_Aniso_4_Checked(object sender, RoutedEventArgs e)
+        {
+            MaxAnisotropy = 4;
+        }
+
+        private void RadioButton_Aniso_8_Checked(object sender, RoutedEventArgs e)
+        {
+            MaxAnisotropy = 8;
+        }
+
+        private void RadioButton_Aniso_16_Checked(object sender, RoutedEventArgs e)
+        {
+            MaxAnisotropy = 16;
         }
 
         private void TonemapperComboBox_SelectionChanged(object sender, RoutedEventArgs e)

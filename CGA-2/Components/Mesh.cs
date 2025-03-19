@@ -19,7 +19,7 @@ namespace CGA2.Components
 
         public static Mesh CalculateTangents(Mesh mesh)
         {
-            Mesh newMesh = new() { Materials = mesh.Materials};
+            Mesh newMesh = new() { Materials = mesh.Materials };
 
             Dictionary<(int, sbyte), int> indicesDictionary = [];
 
