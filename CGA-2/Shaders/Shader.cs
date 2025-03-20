@@ -17,6 +17,7 @@ namespace CGA2.Shaders
             Vector3 n,
             Vector3 cameraPosition,
             Vector3 p,
+            ClearCoatParams clearCoat,
             float transmission
         );
     }

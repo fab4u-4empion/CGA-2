@@ -29,12 +29,18 @@ namespace CGA2.Components.Materials
 
         public Vector3 Emission { get; set; } = Zero;
 
+        public float ClearCoatFactor { get; set; } = 0f;
+        public float ClearCoatRougness { get; set; } = 0f;
+
         public RGBATexture? BaseColorTexture { get; set; } = null;
         public NormalTexture? NormalTexture { get; set; } = null;
         public NonColorTexture? RMTexture { get; set; } = null;
         public NonColorTexture? OcclusionTexture { get; set; } = null;
         public RGBATexture? EmissiveTexture { get; set; } = null;
         public NonColorTexture? TransmissionTexture { get; set; } = null;
+        public NonColorTexture? ClearCoatTexture { get; set; } = null;
+        public NonColorTexture? ClearCoatRougnessTexture { get; set; } = null;
+        public NormalTexture? ClearCoatNormalTexture { get; set; } = null;
 
         public bool IsTransparent => AlphaMode != AlphaMode.OPAQUE || TransmissionTexture != null || TransmissionFactor != 0;
 
@@ -72,6 +78,15 @@ namespace CGA2.Components.Materials
         public float GetTransmission(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
             return TransmissionTexture?.GetSample(uv, uv1, uv2).X ?? TransmissionFactor;
+        }
+
+        public ClearCoatParams GetClearCoatParams(Vector2 uv, Vector2 uv1, Vector2 uv2)
+        {
+            return new(
+                ClearCoatTexture?.GetSample(uv, uv1, uv2).X ?? ClearCoatFactor,
+                ClearCoatRougnessTexture?.GetSample(uv, uv1, uv2).Y ?? ClearCoatRougness,
+                ClearCoatTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? UnitZ
+            );
         }
     }
 }

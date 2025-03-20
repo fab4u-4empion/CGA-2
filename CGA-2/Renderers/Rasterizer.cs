@@ -272,15 +272,17 @@ namespace CGA2.Renderers
             Vector3 emission = meshObject.Mesh.Materials[objectInfo.Index].GetEmission(uv, uv_x, uv_y);
             Vector3 normal = meshObject.Mesh.Materials[objectInfo.Index].GetNormal(uv, uv_x, uv_y);
             float transmission = meshObject.Mesh.Materials[objectInfo.Index].GetTransmission(uv, uv_x, uv_y);
+            ClearCoatParams clearCoatParams = meshObject.Mesh.Materials[objectInfo.Index].GetClearCoatParams(uv, uv_x, uv_y);
 
             Vector3 t = (u * t1 + v * t2 + w * t3);
             Vector3 b = Cross(n, t) * meshObject.Mesh.Signs[objectInfo.Index];
             normal = t * normal.X + b * normal.Y + n * normal.Z;
+            clearCoatParams.Normal = t * clearCoatParams.Normal.X + b * clearCoatParams.Normal.Y + n * clearCoatParams.Normal.Z;
 
             if (det1 < 0)
-                normal = -normal;
+                (normal, clearCoatParams.Normal) = (-normal, -clearCoatParams.Normal);
 
-            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw, transmission);
+            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw, clearCoatParams, transmission);
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, Components.Environment environment, ScreenToWorldParams screenToWorld)
@@ -329,8 +331,6 @@ namespace CGA2.Renderers
             for (int i = start; i < length + start; i++)
             {
                 Color pixel = GetPixelColor(cameraObject, lightsObjects, environment, screenToWorld, (LayersBuffer[i].MeshObject, LayersBuffer[i].Index), x, y);
-
-                if (pixel.Alpha == 0) continue;
 
                 color += (1f - alpha) * pixel.BaseColor;
                 alpha += (1f - alpha) * pixel.Alpha;

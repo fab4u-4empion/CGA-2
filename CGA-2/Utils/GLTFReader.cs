@@ -170,7 +170,7 @@ namespace CGA2.Utils
                     {
                         if (gltfMaterial["extensions"]["KHR_materials_transmission"] != null)
                         {
-                            material.TransmissionFactor = (float)(gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionFactor"] ?? 0);
+                            material.TransmissionFactor = (float)(gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionFactor"] ?? 0f);
 
                             if (gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionTexture"] != null)
                             {
@@ -180,6 +180,42 @@ namespace CGA2.Utils
                                     textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.NonColor);
 
                                 material.TransmissionTexture = (NonColorTexture)textures[index];
+                            }
+                        }
+
+                        if (gltfMaterial["extensions"]["KHR_materials_clearcoat"] != null)
+                        {
+                            material.ClearCoatFactor = (float)(gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatFactor"] ?? 0f);
+                            material.ClearCoatRougness = (float)(gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatRoughnessFactor"] ?? 0f);
+
+                            if (gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatTexture"] != null)
+                            {
+                                int index = (int)gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatTexture"]["index"];
+
+                                if (textures[index] == null)
+                                    textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.NonColor);
+
+                                material.ClearCoatTexture = (NonColorTexture)textures[index];
+                            }
+
+                            if (gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatRoughnessTexture"] != null)
+                            {
+                                int index = (int)gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatRoughnessTexture"]["index"];
+
+                                if (textures[index] == null)
+                                    textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.NonColor);
+
+                                material.ClearCoatRougnessTexture = (NonColorTexture)textures[index];
+                            }
+
+                            if (gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatNormalTexture"] != null)
+                            {
+                                int index = (int)gltfMaterial["extensions"]["KHR_materials_clearcoat"]["clearcoatNormalTexture"]["index"];
+
+                                if (textures[index] == null)
+                                    textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.Normal);
+
+                                material.ClearCoatNormalTexture = (NormalTexture)textures[index];
                             }
                         }
                     }
