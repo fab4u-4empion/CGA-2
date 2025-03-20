@@ -16,7 +16,8 @@ namespace CGA2.Shaders
             PBRParams pbrParams,
             Vector3 n,
             Vector3 cameraPosition,
-            Vector3 p
+            Vector3 p,
+            float transmission
         );
     }
 }

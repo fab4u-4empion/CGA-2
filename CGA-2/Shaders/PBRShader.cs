@@ -42,10 +42,12 @@ namespace CGA2.Shaders
             PBRParams pbrParams, 
             Vector3 n, 
             Vector3 cameraPosition, 
-            Vector3 p
+            Vector3 p,
+            float transmission
         )
         {
             float r2 = pbrParams.Roughness * pbrParams.Roughness;
+            transmission = 1f - transmission;
 
             Vector3 N = Normalize(n);
             Vector3 V = Normalize(cameraPosition - p);
@@ -56,7 +58,7 @@ namespace CGA2.Shaders
 
             Vector3 F0 = Lerp(new(0.04f), baseColor.BaseColor, pbrParams.Metallic);
             Vector3 albedo = (1 - pbrParams.Metallic) * baseColor.BaseColor;
-            Vector3 diffuse = albedo / float.Pi;
+            Vector3 diffuse = albedo / float.Pi * transmission;
 
             foreach (LightObject light in lights)
             {
@@ -83,7 +85,7 @@ namespace CGA2.Shaders
             }
 
             Vector3 ambientReflectance = F0;
-            Vector3 ambientDiffuse = albedo / float.Pi;
+            Vector3 ambientDiffuse = albedo / float.Pi * transmission;
             Vector3 ambientIrradiance = environment.GetIBLDiffuseColor(N);
 
             float lod = pbrParams.Roughness * (environment.IBLSpecularMap.Count - 1);
@@ -102,7 +104,7 @@ namespace CGA2.Shaders
 
             color += emission * EmissionIntensity;
 
-            return new(color * baseColor.Alpha, baseColor.Alpha);
+            return new(color * baseColor.Alpha, baseColor.Alpha * transmission);
         }
     }
 }

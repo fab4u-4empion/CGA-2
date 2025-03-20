@@ -166,6 +166,24 @@ namespace CGA2.Utils
                     if (gltfMaterial["doubleSided"] != null)
                         material.DoubleSided = (bool)gltfMaterial["doubleSided"];
 
+                    if (gltfMaterial["extensions"] != null)
+                    {
+                        if (gltfMaterial["extensions"]["KHR_materials_transmission"] != null)
+                        {
+                            material.TransmissionFactor = (float)(gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionFactor"] ?? 0);
+
+                            if (gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionTexture"] != null)
+                            {
+                                int index = (int)gltfMaterial["extensions"]["KHR_materials_transmission"]["transmissionTexture"]["index"];
+
+                                if (textures[index] == null)
+                                    textures[index] = LoadTexture(directory, gltfData, index, TextureTypes.NonColor);
+
+                                material.TransmissionTexture = (NonColorTexture)textures[index];
+                            }
+                        }
+                    }
+
                     materials.Add(material);
                 }
 

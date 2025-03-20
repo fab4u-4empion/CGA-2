@@ -12,8 +12,6 @@ using CGA2.Utils;
 using CGA2.Components.Cameras;
 using CGA2.Components.Materials;
 using static CGA2.Utils.ArrayTools;
-using System.Diagnostics;
-using System.Windows;
 
 namespace CGA2.Renderers
 {
@@ -273,6 +271,7 @@ namespace CGA2.Renderers
             PBRParams pbrParams = meshObject.Mesh.Materials[objectInfo.Index].GetPBRParams(uv, uv_x, uv_y);
             Vector3 emission = meshObject.Mesh.Materials[objectInfo.Index].GetEmission(uv, uv_x, uv_y);
             Vector3 normal = meshObject.Mesh.Materials[objectInfo.Index].GetNormal(uv, uv_x, uv_y);
+            float transmission = meshObject.Mesh.Materials[objectInfo.Index].GetTransmission(uv, uv_x, uv_y);
 
             Vector3 t = (u * t1 + v * t2 + w * t3);
             Vector3 b = Cross(n, t) * meshObject.Mesh.Signs[objectInfo.Index];
@@ -281,7 +280,7 @@ namespace CGA2.Renderers
             if (det1 < 0)
                 normal = -normal;
 
-            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw);
+            return Shader.GetColor(lightsObjects, environment, baseColor, emission, pbrParams, normal, cameraObject.WorldLocation, pw, transmission);
         }
 
         private void DrawViewBuffer(CameraObject cameraObject, List<LightObject> lightsObjects, Components.Environment environment, ScreenToWorldParams screenToWorld)

@@ -22,6 +22,7 @@ namespace CGA2.Components.Materials
         public float Alpha { get; set; } = 1f;
         public float AlphaCutoff { get; set; } = 0.5f;
         public AlphaMode AlphaMode { get; set; } = AlphaMode.OPAQUE;
+        public float TransmissionFactor { get; set; } = 0f;
 
         public float MetallicFactor { get; set; } = 1f;
         public float RoghnessFactor { get; set; } = 1f;
@@ -33,8 +34,9 @@ namespace CGA2.Components.Materials
         public NonColorTexture? RMTexture { get; set; } = null;
         public NonColorTexture? OcclusionTexture { get; set; } = null;
         public RGBATexture? EmissiveTexture { get; set; } = null;
+        public NonColorTexture? TransmissionTexture { get; set; } = null;
 
-        public bool IsTransparent => AlphaMode != AlphaMode.OPAQUE;
+        public bool IsTransparent => AlphaMode != AlphaMode.OPAQUE || TransmissionTexture != null || TransmissionFactor != 0;
 
         public Color GetBaseColor(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
@@ -65,6 +67,11 @@ namespace CGA2.Components.Materials
         public Vector3 GetNormal(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
             return NormalTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? UnitZ;
+        }
+
+        public float GetTransmission(Vector2 uv, Vector2 uv1, Vector2 uv2)
+        {
+            return TransmissionTexture?.GetSample(uv, uv1, uv2).X ?? TransmissionFactor;
         }
     }
 }
