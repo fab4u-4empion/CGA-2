@@ -183,6 +183,31 @@ namespace CGA2
                     Draw();
                     break;
 
+                case Key.OemMinus:
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        EmissionIntensity -= 10f;
+                        EmissionIntensity = Max(EmissionIntensity, 0);
+                    }
+                    else
+                    {
+                        Exposure *= 0.84089642f;
+                        Exposure = Max(Exposure, 0.03125f);
+                    }
+                    Draw();
+                    break;
+
+                case Key.OemPlus:
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
+                        EmissionIntensity += 10f;
+                    else
+                    {
+                        Exposure *= 1.18920712f;
+                        Exposure = Min(Exposure, 32);
+                    }
+                    Draw();
+                    break;
+
                 case Key.F2:
                     ObjectSettings OSDialog = new(Scene);
                     OSDialog.ShowDialog();
