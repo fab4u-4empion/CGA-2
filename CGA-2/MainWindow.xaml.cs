@@ -268,6 +268,46 @@ namespace CGA2
                         }
                     }
                     break;
+
+                case Key.D1:
+                    if (!e.IsRepeat)
+                    {
+                        Scaling = 0.25f;
+                        Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    }
+                    break;
+
+                case Key.D2:
+                    if (!e.IsRepeat)
+                    {
+                        Scaling = 0.5f;
+                        Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    }
+                    break;
+
+                case Key.D3:
+                    if (!e.IsRepeat)
+                    {
+                        Scaling = 1;
+                        Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    }
+                    break;
+
+                case Key.D4:
+                    if (!e.IsRepeat)
+                    {
+                        Scaling = 2;
+                        Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    }
+                    break;
+
+                case Key.D5:
+                    if (!e.IsRepeat)
+                    {
+                        Scaling = 4;
+                        Window_SizeChanged(this, (EventArgs.Empty as SizeChangedEventArgs)!);
+                    }
+                    break;
             }
         }
         
