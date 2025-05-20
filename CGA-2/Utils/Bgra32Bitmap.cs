@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Windows.Media.Imaging;
 using static System.Windows.Media.PixelFormats;
+using static System.Numerics.Vector4;
 
 namespace CGA2.Utils
 {
@@ -55,7 +56,7 @@ namespace CGA2.Utils
             float g = pixel[1] / 255f;
             float r = pixel[2] / 255f;
             float a = pixel[3] / 255f;
-            return new(r, g, b, a);
+            return Create(r, g, b, a);
         }
 
         public Vector3 GetRGBPixel(int x, int y)

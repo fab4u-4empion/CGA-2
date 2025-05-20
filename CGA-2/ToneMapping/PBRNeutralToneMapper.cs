@@ -13,7 +13,7 @@ namespace CGA2.ToneMapping
             const float startCompression = 0.8f - 0.04f;
             const float desaturation = 0.15f;
 
-            float x = float.Min(color.X, Min(color.Y, color.Z));
+            float x = Min(color.X, Min(color.Y, color.Z));
             float offset = x < 0.08f ? x - 6.25f * x * x : 0.04f;
             color -= Create(offset);
 

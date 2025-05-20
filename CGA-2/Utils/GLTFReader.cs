@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Numerics;
 using System.Windows.Media.Imaging;
+using static System.Numerics.Vector3;
 
 namespace CGA2.Utils
 {
@@ -129,7 +130,7 @@ namespace CGA2.Utils
 
                         if (gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"] != null)
                         {
-                            material.BaseColor = new(
+                            material.BaseColor = Create(
                                 (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][0],
                                 (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][1],
                                 (float)gltfMaterial["pbrMetallicRoughness"]["baseColorFactor"][2]
@@ -321,7 +322,7 @@ namespace CGA2.Utils
                         light.Name = (string)gltfLight["name"];
 
                         if (gltfLight["color"] != null)
-                            light.Color = new(
+                            light.Color = Create(
                                 (float)gltfLight["color"][0],
                                 (float)gltfLight["color"][1],
                                 (float)gltfLight["color"][2]
@@ -370,14 +371,14 @@ namespace CGA2.Utils
                         );
 
                     if (gltfNode["scale"] != null)
-                        newNode.Scale = new(
+                        newNode.Scale = Create(
                             (float)gltfNode["scale"][0],
                             (float)gltfNode["scale"][1],
                             (float)gltfNode["scale"][2]
                         );
 
                     if (gltfNode["translation"] != null)
-                        newNode.Location = new(
+                        newNode.Location = Create(
                             (float)gltfNode["translation"][0],
                             (float)gltfNode["translation"][1],
                             (float)gltfNode["translation"][2]

@@ -1,12 +1,13 @@
 ﻿using CGA2.Components.Materials.Textures;
 using System.Numerics;
+using static System.Numerics.Vector3;
 
 namespace CGA2.Components
 {
     public class Environment : Component
     {
         public override string Name { get; set; } = "Environment";
-        public Vector3 Color { get; set; } = new(0.15f);
+        public Vector3 Color { get; set; } = Create(0.15f);
 
         public HDRTexture? IBLDiffuseMap { get; set; } = null;
         public List<HDRTexture> IBLSpecularMap { get; set; } = [];

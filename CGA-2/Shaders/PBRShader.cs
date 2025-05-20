@@ -4,7 +4,6 @@ using System.Numerics;
 using static System.Numerics.Vector3;
 using static System.Single;
 using static CGA2.Settings;
-using System.Windows;
 
 namespace CGA2.Shaders
 {
@@ -61,7 +60,7 @@ namespace CGA2.Shaders
 
             Vector3 color = Zero;
 
-            Vector3 F0 = Lerp(new(0.04f), baseColor.BaseColor, pbrParams.Metallic);
+            Vector3 F0 = Lerp(Create(0.04f), baseColor.BaseColor, pbrParams.Metallic);
             Vector3 albedo = (1 - pbrParams.Metallic) * baseColor.BaseColor;
             Vector3 diffuse = albedo / float.Pi * transmission;
 
@@ -90,7 +89,7 @@ namespace CGA2.Shaders
 
                 float coatDistribution = Distribution(CNdotH, cr2);
                 float coatVisibility = Visibility(CNdotV, CNdotL, cr2);
-                Vector3 coatReflectance = FresnelSchlick(VdotH, new(0.04f)) * clearCoat.Factor;
+                Vector3 coatReflectance = FresnelSchlick(VdotH, Create(0.04f)) * clearCoat.Factor;
 
                 Vector3 coatSpecular = coatReflectance * coatVisibility * coatDistribution;
 
@@ -110,9 +109,9 @@ namespace CGA2.Shaders
             Vector3 ambientSpecularLight1 = environment.GetIBLSpecularColor(R, lod1);
             Vector3 ambientSpecularLight = Lerp(ambientSpecularLight0, ambientSpecularLight1, lod - lod0);
             Vector3 brdf = environment.BRDFLUT.GetColor(NdotV, 1 - pbrParams.Roughness);
-            Vector3 ambientSpecular = ambientSpecularLight * (ambientReflectance * brdf.X + new Vector3(brdf.Y));
+            Vector3 ambientSpecular = ambientSpecularLight * (ambientReflectance * brdf.X + Create(brdf.Y));
 
-            Vector3 coatReflectanceIBL = new Vector3(0.04f) * clearCoat.Factor;
+            Vector3 coatReflectanceIBL = Create(0.04f) * clearCoat.Factor;
             lod = clearCoat.Rougness * (environment.IBLSpecularMap.Count - 1);
             lod0 = (int)lod;
             lod1 = int.Min(lod0 + 1, environment.IBLSpecularMap.Count - 1);
@@ -122,7 +121,7 @@ namespace CGA2.Shaders
             Vector3 coatSpecularLight1 = environment.GetIBLSpecularColor(R, lod1);
             Vector3 coatSpecularLight = Lerp(coatSpecularLight0, coatSpecularLight1, lod - lod0);
             brdf = environment.BRDFLUT.GetColor(CNdotV, 1 - clearCoat.Rougness);
-            Vector3 coatSpecularIBL = coatSpecularLight * (coatReflectanceIBL * brdf.X + new Vector3(brdf.Y) * clearCoat.Factor);
+            Vector3 coatSpecularIBL = coatSpecularLight * (coatReflectanceIBL * brdf.X + Create(brdf.Y) * clearCoat.Factor);
 
             color += (((One - ambientReflectance) * ambientDiffuse * ambientIrradiance + ambientSpecular) * (One - coatReflectanceIBL) + coatSpecularIBL) * pbrParams.Occlusion;
 

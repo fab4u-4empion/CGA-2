@@ -7,6 +7,7 @@ using CGA2.UI.ObjectSettings;
 using CGA2.Utils;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -85,7 +86,7 @@ namespace CGA2
             CameraObject cameraObject = new()
             {
                 Camera = camera,
-                Location = new(0f, 5.5f, 20f),
+                Location = Vector3.Create(0f, 5.5f, 20f),
                 TargetRadius = 20f
             };
 
@@ -94,7 +95,7 @@ namespace CGA2
             Scene.RootObjects.Add(cameraObject);
             Scene.Nodes.Add(cameraObject);
 
-            Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(new(0.251f));
+            Scene.Environment.Color = ToneMapping.ToneMapper.SrgbToLinear(Vector3.Create(0.251f));
 
             GLTFReader.OpenFile("Assets\\lamps.gltf", Scene);
 
@@ -211,6 +212,7 @@ namespace CGA2
                 case Key.F2:
                     ObjectSettings OSDialog = new(Scene);
                     OSDialog.ShowDialog();
+                    Scene.UpdateScene();
                     Draw();
                     break;
 
@@ -264,6 +266,7 @@ namespace CGA2
                         if (dlg.ShowDialog() == true)
                         {
                             GLTFReader.OpenFile(dlg.FileName, Scene);
+                            Scene.UpdateScene();
                             Draw();
                         }
                     }

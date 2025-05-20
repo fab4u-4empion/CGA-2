@@ -64,7 +64,7 @@ namespace CGA2.Components.Materials
 
         public PBRParams GetPBRParams(Vector2 uv, Vector2 uv1, Vector2 uv2)
         {
-            return new(RMTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? new Vector3(1f, RoghnessFactor, MetallicFactor))
+            return new(RMTexture?.GetSample(uv, uv1, uv2).AsVector3() ?? Create(1f, RoghnessFactor, MetallicFactor))
             {
                 Occlusion = OcclusionTexture?.GetSample(uv, uv1, uv2).X ?? 1f
             };

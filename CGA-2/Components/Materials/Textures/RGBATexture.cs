@@ -12,7 +12,7 @@ namespace CGA2.Components.Materials.Textures
         {
             Vector4 color = src.GetRGBAPixel(x, y);
 
-            return new(SrgbToLinear(color.AsVector3()), color.W);
+            return Vector4.Create(SrgbToLinear(color.AsVector3()), color.W);
         }
     }
 }

@@ -11,7 +11,6 @@ using System.Collections.Concurrent;
 using CGA2.Utils;
 using CGA2.Components.Cameras;
 using CGA2.Components.Materials;
-using static CGA2.Utils.ArrayTools;
 
 namespace CGA2.Renderers
 {
@@ -24,6 +23,7 @@ namespace CGA2.Renderers
         public override Bgra32Bitmap Result { get; set; } = new(1, 1);
 
         private Matrix4x4 ViewportMatrix { get; set; } = CreateViewportLeftHanded(-0.5f, -0.5f, 1, 1, 0, 1);
+        private Matrix4x4 ViewProjectionMatrix { get; set; } = Identity;
 
         private Buffer<SpinLock> Spins = new(0, 0);
         private Buffer<float> ZBuffer = new(0, 0);
@@ -71,45 +71,17 @@ namespace CGA2.Renderers
             }
         }
 
-        private static void TransformAttributes(CameraObject cameraObject, MeshObject meshObject)
+        private void Rasterize(List<MeshObject> meshObjects, int[] ranges, bool drawTransparentTriangles, Action<int, int, float, ViewBufferData> callBack)
         {
-            Matrix4x4 worldMatrix = meshObject.WorldMatrix;
-            Matrix4x4 viewMatrix = cameraObject.ViewMatrix;
-            Matrix4x4 projectionMatrix = cameraObject.Camera.ProjectionMatrix;
-            Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
-
-            Invert(worldMatrix, out Matrix4x4 invWorldMatrix);
-            invWorldMatrix = Transpose(invWorldMatrix);
-
-            meshObject.WorldPositions.Clear();
-            meshObject.WorldNormals.Clear();
-            meshObject.WorldTangents.Clear();
-            meshObject.ClipPositions.Clear();
-
-            for (int i = 0; i < meshObject.Mesh.Positions.Count; i++)
-            {
-                meshObject.WorldPositions.Add(Transform(meshObject.Mesh.Positions[i], worldMatrix));
-                meshObject.ClipPositions.Add(Vector4.Transform(meshObject.WorldPositions[i], viewProjectionMatrix));
-            }
-
-            for (int i = 0; i < meshObject.Mesh.Normals.Count; i++)
-            {
-                meshObject.WorldNormals.Add(Normalize(Transform(meshObject.Mesh.Normals[i], invWorldMatrix)));
-                meshObject.WorldTangents.Add(Normalize(Transform(meshObject.Mesh.Tangents[i], invWorldMatrix)));
-            }
-        }
-
-        private void Rasterize(List<MeshObject> meshObjects, List<Range> ranges, bool drawTransparentTriangles, Action<int, int, float, ViewBufferData> callBack)
-        {
-            Parallel.ForEach(Partitioner.Create(0, ranges[^1].End.Value), (range) =>
+            Parallel.ForEach(Partitioner.Create(1, ranges[^1]), (range) =>
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    int m = BinarySearch(ranges, i);
+                    int m = (m = Array.BinarySearch(ranges, i)) < 0 ? ~m : m;
 
                     MeshObject meshObject = meshObjects[m];
 
-                    int triangleIndex = i - ranges[m].Start.Value;
+                    int triangleIndex = (m == 0 ? i : i - ranges[m - 1]) - 1;
                     int index = triangleIndex * 3;
 
                     if (drawTransparentTriangles != meshObject.Mesh.Materials[triangleIndex].IsTransparent)
@@ -119,9 +91,9 @@ namespace CGA2.Renderers
                     int index2 = meshObject.Mesh.Triangles[index + 1];
                     int index3 = meshObject.Mesh.Triangles[index + 2];
 
-                    Vector4 v1 = meshObject.ClipPositions[index1];
-                    Vector4 v2 = meshObject.ClipPositions[index2];
-                    Vector4 v3 = meshObject.ClipPositions[index3];
+                    Vector4 v1 = Vector4.Transform(meshObject.WorldPositions[index1], ViewProjectionMatrix);
+                    Vector4 v2 = Vector4.Transform(meshObject.WorldPositions[index2], ViewProjectionMatrix);
+                    Vector4 v3 = Vector4.Transform(meshObject.WorldPositions[index3], ViewProjectionMatrix);
 
                     Vector4[] result = ArrayPool<Vector4>.Shared.Rent(4);
                     byte count = 0;
@@ -162,7 +134,7 @@ namespace CGA2.Renderers
                         Vector4 b = result[j];
                         Vector4 c = result[j + 1];
 
-                        if (meshObject.Mesh.Materials[triangleIndex].DoubleSided || PerpDotProduct(new(c.X - a.X, c.Y - a.Y), new(b.X - a.X, b.Y - a.Y)) > 0)
+                        if (meshObject.Mesh.Materials[triangleIndex].DoubleSided || PerpDotProduct(Vector2.Create(c.X - a.X, c.Y - a.Y), Vector2.Create(b.X - a.X, b.Y - a.Y)) > 0)
                         {
 
                             if (b.X < a.X)
@@ -421,28 +393,25 @@ namespace CGA2.Renderers
 
             ScreenToWorldParams screenToWorld = GetViewportToWorldParams(cameraObject);
 
-            Array.Fill(HDRBuffer.Array, new(Zero, 0f));
-            Array.Fill(ZBuffer.Array, 1);
-            Array.Fill(ViewBuffer.Array, (null, -1));
-            Array.Fill(OffsetBuffer.Array, 0);
-            Array.Fill(CountBuffer.Array, (byte)0);
+            ViewProjectionMatrix = cameraObject.ViewMatrix * cameraObject.Camera.ProjectionMatrix;
+
+            Array.Fill<Color>(HDRBuffer, new(Zero, 0f));
+            Array.Fill<float>(ZBuffer, 1);
+            Array.Fill<ViewBufferData>(ViewBuffer, (null, -1));
+            Array.Fill<int>(OffsetBuffer, 0);
+            Array.Fill<byte>(CountBuffer, 0);
 
             Result.Source.Lock();
 
             if (scene.MeshObjects.Count > 0)
             {
-                Parallel.For(0, scene.MeshObjects.Count, i =>
-                {
-                    TransformAttributes(cameraObject, scene.MeshObjects[i]);
-                });
+                int[] ranges = new int[scene.MeshObjects.Count];
+                int totalLenght = 0;
 
-                List<Range> ranges = [];
-                int totalLength = 0;
-
-                foreach (MeshObject meshObject in scene.MeshObjects)
+                for (int i = 0; i < scene.MeshObjects.Count; i++)
                 {
-                    ranges.Add(totalLength..(totalLength + meshObject.Mesh.Triangles.Count / 3 - 1));
-                    totalLength += meshObject.Mesh.Triangles.Count / 3;
+                    totalLenght += scene.MeshObjects[i].Mesh.Triangles.Count / 3;
+                    ranges[i] = totalLenght;
                 }
 
                 Rasterize(scene.MeshObjects, ranges, false, DrawIntoViewBuffer);
@@ -493,7 +462,7 @@ namespace CGA2.Renderers
             OffsetBuffer = new(Result.PixelWidth, Result.PixelHeight);
             CountBuffer = new(Result.PixelWidth, Result.PixelHeight);
 
-            Array.Fill(Spins.Array, new(false));
+            Array.Fill<SpinLock>(Spins, new(false));
 
             ViewportMatrix = CreateViewportLeftHanded(-0.5f, -0.5f, Result.PixelWidth, Result.PixelHeight, 0, 1);
         }

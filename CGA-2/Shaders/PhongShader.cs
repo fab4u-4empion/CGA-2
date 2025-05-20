@@ -33,7 +33,7 @@ namespace CGA2.Shaders
 
             Vector3 color = baseColor.BaseColor * environment.Color * pbrParams.Occlusion * transmission + emission * EmissionIntensity;
 
-            Vector3 F0 = Lerp(new(0.04f), baseColor.BaseColor, pbrParams.Metallic);
+            Vector3 F0 = Lerp(Create(0.04f), baseColor.BaseColor, pbrParams.Metallic);
 
             foreach (LightObject light in lights)
             {
